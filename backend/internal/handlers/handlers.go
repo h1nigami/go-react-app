@@ -1,5 +1,18 @@
 package handlers
 
-import "github.com/h1nigami/go-react-app/backend/internal/database"
+import (
+	"net/http"
 
-var db database.DB = database.NewConnection("test.db")
+	"github.com/gin-gonic/gin"
+	"github.com/h1nigami/go-react-app/backend/internal/database"
+)
+
+var db database.DB = database.NewConnection("data.db")
+
+func AllTask(ctx *gin.Context) {
+	tasks, err := db.GetTasks()
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": err})
+	}
+	ctx.JSON(http.StatusOK, tasks)
+}
