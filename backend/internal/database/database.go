@@ -36,3 +36,5 @@ func (d *DB) GetTasks() ([]models.Task, error) {
 	result := d.pool.Find(&tasks)
 	return tasks, result.Error
 }
+
+var DataBase DB = NewConnection("data.db")
