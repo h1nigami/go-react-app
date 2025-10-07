@@ -37,4 +37,14 @@ func (d *DB) GetTasks() ([]models.Task, error) {
 	return tasks, result.Error
 }
 
+func (d *DB) GetTaskByid(id int) (models.Task, error) {
+	var task models.Task
+	result := d.pool.Where("ID = ?", id).Find(&task)
+	return task, result.Error
+}
+
+func (d *DB) Createtask(task *models.Task) {
+	d.pool.Create(&task)
+}
+
 var DataBase DB = NewConnection("data.db")
