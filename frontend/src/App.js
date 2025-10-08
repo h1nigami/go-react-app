@@ -1,7 +1,6 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import { createTask, deleteTask, getTask } from './api';
-import React from 'react';
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -55,10 +54,10 @@ function App() {
       </form>
       <ul>
         {tasks.map((t) => (
-          <li style={{padding:'1rem'}} key={t.id}>{t.ID}: {t.title} приоритет {t.priority}
+          <li style={{padding:'1rem'}} key={t.ID}>{t.title} приоритет: {t.priority}
           <button onClick={()=>deletetask(t.ID)} className='button'>Удалить</button>
             </li>
-        ))}
+        ))};
       </ul>
     </div>
   );
