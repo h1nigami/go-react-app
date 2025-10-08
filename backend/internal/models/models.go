@@ -8,5 +8,11 @@ type Task struct {
 	gorm.Model
 	Title    string `json:"title"`
 	Is_Done  bool   `json:"completed"`
-	Priority int    `json:"priority"`
+	Priority string `json:"priority"`
+}
+
+type User struct {
+	gorm.Model
+	Username string
+	Password string
 }

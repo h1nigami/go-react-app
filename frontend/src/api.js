@@ -1,3 +1,5 @@
+
+
 const API_URL = 'http://localhost:8000'
 
 export async function getTask() {
@@ -20,4 +22,12 @@ export async function createTask(task) {
     });
     if (!response.ok) throw new Error('failed to create task');
     return response.json();
+}
+
+export async function deleteTask(id) {
+    const responce = await fetch(`${API_URL}/task/${id}`, {
+        method: 'DELETE'
+    });
+    if (!responce.ok) throw new Error('failed to delete task');
+    return responce.json();
 }

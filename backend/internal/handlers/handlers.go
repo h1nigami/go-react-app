@@ -38,7 +38,18 @@ func CreateTask(ctx *gin.Context) {
 	var task models.Task
 	if err := ctx.BindJSON(&task); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
+	} else {
+		db.CreateTask(&task)
+		ctx.JSON(http.StatusCreated, task)
 	}
-	db.CreateTask(&task)
-	ctx.JSON(http.StatusBadRequest, gin.H{"created": task})
+}
+
+func DeleteTask(ctx *gin.Context) {
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+		return
+	}
+	task := db.DeleteTask(id)
+	ctx.JSON(http.StatusOK, gin.H{"deleted": task})
 }

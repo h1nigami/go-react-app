@@ -25,6 +25,7 @@ func NewConnection(db_name string) DB {
 
 func (d *DB) createTables() {
 	d.pool.AutoMigrate(&models.Task{})
+	d.pool.AutoMigrate(&models.User{})
 }
 
 func (d *DB) CreateTask(task *models.Task) {
@@ -45,6 +46,15 @@ func (d *DB) GetTaskByid(id int) (models.Task, error) {
 
 func (d *DB) Createtask(task *models.Task) {
 	d.pool.Create(&task)
+}
+
+func (d *DB) DeleteTask(id int) models.Task {
+	task, err := d.GetTaskByid(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	d.pool.Delete(&task)
+	return task
 }
 
 var DataBase DB = NewConnection("data.db")
