@@ -31,3 +31,7 @@ export async function deleteTask(id) {
     if (!responce.ok) throw new Error('failed to delete task');
     return responce.json();
 }
+
+export async function updateTask(id){
+    
+}

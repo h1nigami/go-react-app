@@ -57,4 +57,13 @@ func (d *DB) DeleteTask(id int) models.Task {
 	return task
 }
 
+func (d *DB) UpdateTask(id int, task models.Task) error {
+
+	err := d.pool.Model(&models.Task{}).Where("ID = ?", id).Updates(map[string]interface{}{
+		"Title":    task.Title,
+		"Priority": task.Priority,
+	})
+	return err.Error
+}
+
 var DataBase DB = NewConnection("data.db")

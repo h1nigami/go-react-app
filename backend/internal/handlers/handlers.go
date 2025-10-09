@@ -53,3 +53,18 @@ func DeleteTask(ctx *gin.Context) {
 	task := db.DeleteTask(id)
 	ctx.JSON(http.StatusOK, gin.H{"deleted": task})
 }
+
+func Updatetask(ctx *gin.Context) {
+	var task models.Task
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+		return
+	}
+	if err := db.UpdateTask(id, task); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+	} else {
+		ctx.JSON(http.StatusOK, task)
+	}
+
+}
