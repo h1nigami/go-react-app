@@ -1,6 +1,7 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import { createTask, deleteTask, getTask } from './api';
+import {motion, AnimatePresence} from 'framer-motion'
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -28,7 +29,7 @@ function App() {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 600, margin: '0 auto' }}>
+    <div className='todo-card'>
       <h1>Tasks</h1>
       <form onSubmit={handleSubmit} style={{display: 'flex',
           flexDirection: 'column',
@@ -53,11 +54,21 @@ function App() {
         <button type='submit' className='button'>Добавить</button>
       </form>
       <ul>
-        {tasks.map((t) => (
-          <li style={{padding:'1rem'}} key={t.ID}>{t.title} приоритет: {t.priority}
-          <button onClick={()=>deletetask(t.ID)} className='button'>Удалить</button>
-            </li>
-        ))};
+        <AnimatePresence>
+          {tasks.map((t) => (
+            <motion.li className={`priority-${t.priority}`} 
+            key={t.ID}
+            initial={{opacity:0, y:20}}
+            animate={{opacity:1, y:0}}
+            exit={{opacity:0, x:100}}
+            transition={{duration:0.3}}>
+              <span>
+              {t.title} приоритет: {t.priority}
+              </span>
+            <button onClick={()=>deletetask(t.ID)} className='button'>Удалить</button>
+              </motion.li>
+          ))}
+        </AnimatePresence>
       </ul>
     </div>
   );
