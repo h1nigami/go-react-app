@@ -67,12 +67,14 @@ function App() {
               <span>
               {t.title} приоритет: {t.priority}
               </span>
-            <button onClick={()=>deletetask(t.ID)} className='button' type='submit'>Удалить</button>
-            <EditDropdown 
-                  task={t}
-                  onEdit={(task) => console.log('Редактирование:', task)}
-                  onDelete={(task) => deletetask(task)}
-                />
+              <div className='task-buttons'>
+                <button onClick={()=>deletetask(t.ID)} className='button' type='submit'>Удалить</button>
+                <EditDropdown 
+                      task={t}
+                      onEdit={(task) => console.log('Редактирование:', task)}
+                      onDelete={(task) => deletetask(task)}
+                    />
+                    </div>
               </motion.li>
           ))}
         </AnimatePresence>

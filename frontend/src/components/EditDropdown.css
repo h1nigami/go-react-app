@@ -7,14 +7,19 @@
   background-color: #646cff;
   border: none;
   color: white;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  margin-top: 1rem;
 }
 
 .dropdown-button:hover {
   background-color: #535bf2;
+}
+
+.dropdown-button:active{
+  transform: scale(0.98);
 }
 
 .dropdown-menu {
