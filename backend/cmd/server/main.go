@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -19,10 +18,10 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-	router.GET("/ping", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"message": "pong_from " + ctx.ClientIP()}) })
 	router.GET("/task", handlers.AllTask)
 	router.GET("/task/:id", handlers.GetTaskById)
 	router.POST("/task", handlers.CreateTask)
 	router.DELETE("/task/:id", handlers.DeleteTask)
+	router.PATCH("task/:id", handlers.Updatetask)
 	router.Run("localhost:8000")
 }

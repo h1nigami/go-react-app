@@ -32,6 +32,14 @@ export async function deleteTask(id) {
     return responce.json();
 }
 
-export async function updateTask(id){
-    
+export async function updateTask(id, updatedTask){
+    const responce = await fetch(`${API_URL}/task/${id}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type':'application/json',
+        },
+        body: JSON.stringify(updatedTask)
+    });
+    if (!responce.ok) throw new Error('failed to update task');
+    return responce.json()
 }

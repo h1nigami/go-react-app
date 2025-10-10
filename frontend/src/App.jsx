@@ -1,9 +1,11 @@
 import './App.css';
 import { useEffect, useState } from 'react';
 import { createTask, deleteTask, getTask } from './api';
-import {motion, AnimatePresence} from 'framer-motion'
+import {motion, AnimatePresence} from 'framer-motion';
+import EditDropdown from './components/editDropDown';
 
 function App() {
+  
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [priority, setPriority] = useState('');
@@ -23,7 +25,7 @@ function App() {
     setPriority('')
   };
 
-  const deletetask = async (id)=>{
+ const deletetask = async (id) => {
     await deleteTask(id)
     setTasks(prev => prev.filter(task => task.ID !== id))
   };
@@ -65,7 +67,12 @@ function App() {
               <span>
               {t.title} приоритет: {t.priority}
               </span>
-            <button onClick={()=>deletetask(t.ID)} className='button'>Удалить</button>
+            <button onClick={()=>deletetask(t.ID)} className='button' type='submit'>Удалить</button>
+            <EditDropdown 
+                  task={t}
+                  onEdit={(task) => console.log('Редактирование:', task)}
+                  onDelete={(task) => deletetask(task)}
+                />
               </motion.li>
           ))}
         </AnimatePresence>

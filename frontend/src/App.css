@@ -11,18 +11,19 @@ body {
 
 /* Карточка */
 .todo-card {
-  background: white;
-  margin-top: 5rem;
-  width: 400px;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  background-color: white;
   padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  width: 350px;
+  margin: 3rem auto;
   text-align: center;
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
 .todo-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Заголовок */
@@ -272,3 +273,4 @@ li button {
 li button:hover {
   color: #b91c1c;
 }
+
