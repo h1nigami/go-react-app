@@ -19,7 +19,7 @@ export default function EditDropdown({ onEdit, onDelete, task }) {
 
   return (
     <div className="dropdown-container" ref={menuRef}>
-      <button className="dropdown-button" onClick={() => setOpen(!open)}>
+      <button className="button" onClick={() => setOpen(!open)}>
         Редактировать
       </button>
       {open && (

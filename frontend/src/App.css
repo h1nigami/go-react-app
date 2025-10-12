@@ -62,7 +62,7 @@ select:focus {
 
 /* Кнопка */
 .button {
-  width: 62%;
+  width: 9rem;
   max-width: 300px;
   padding: 0.5rem;
   background-color: #6366f1;
@@ -86,7 +86,7 @@ select:focus {
 ul {
   list-style: none;
   padding: 0;
-  gap: 1rem;
+  gap: 2rem;
 }
 
 /* Элемент списка */
@@ -124,3 +124,8 @@ li span {
   color: #374151;
 }
 
+li .task-buttons{
+  display: flex;
+  gap: 5px;
+  flex-direction: column-reverse;
+}
