@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import './EditDropdown.css';
+import { updateTask } from "../api";
 
-function EditMenu({task, open, setOpen}){
+function EditMenu({task, open, setOpen, onEdit}){
   const menuRef = useRef();
+  const [newTask, setNewTask] = useState(task.Title)
 
   // Закрытие меню при клике вне него
   useEffect(() => {
@@ -15,12 +17,27 @@ function EditMenu({task, open, setOpen}){
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [setOpen]);
 
+  const handleUpdate = async () => {
+    try {
+      await updateTask(task.ID, {'title':newTask})
+      setOpen(false)
+      onEdit(task)
+      setNewTask('')
+    } catch (error){
+      console.error('failed to update task ', error)
+      setOpen(false)
+      onEdit(task)
+      setNewTask('')
+    };
+    
+  }
+
   return (
     open && (
       <div className="dropdown-container" ref={menuRef}>
         <div className="dropdown-menu" >
-          <input value={task.title} readOnly />
-          <button>Изменить</button>
+          <input value={newTask} onChange={(e)=>setNewTask(e.target.value)} />
+          <button onClick={handleUpdate}>Изменить</button>
         </div>
       </div>
     )
@@ -52,7 +69,7 @@ export default function EditDropdown({ onEdit, onDelete, task }) {
       {open && (
         <div className="dropdown-menu">
           <button onClick={() => setEditOpen(!editOpen)}>Изменить задачу</button>       
-          <EditMenu task={task} open={editOpen} setOpen={setEditOpen}/>
+          <EditMenu onEdit={()=> onEdit(task)} task={task} open={editOpen} setOpen={setEditOpen}/>
           <button onClick={()=> onEdit(task)}>Изменить приоритет</button>
           <button onClick={() => onDelete(task.ID)}>Удалить</button>
         </div>

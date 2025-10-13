@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/glebarez/sqlite"
@@ -58,12 +59,17 @@ func (d *DB) DeleteTask(id int) models.Task {
 }
 
 func (d *DB) UpdateTask(id int, task models.Task) error {
+	result := d.pool.Model(&models.Task{}).Where("ID = ?", id).Updates(task)
 
-	err := d.pool.Model(&models.Task{}).Where("ID = ?", id).Updates(map[string]interface{}{
-		"Title":    task.Title,
-		"Priority": task.Priority,
-	})
-	return err.Error
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("task with ID %d not found", id)
+	}
+
+	return nil
 }
 
 var DataBase DB = NewConnection("data.db")

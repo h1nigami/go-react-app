@@ -30,6 +30,11 @@ function App() {
     setTasks(prev => prev.filter(task => task.ID !== id))
   };
 
+  const fetchTasks = async () => {
+    const tasksfromserver = await getTask()
+    setTasks(tasksfromserver);
+  }
+
   return (
     <div className='todo-card'>
       <h1>Tasks</h1>
@@ -71,7 +76,7 @@ function App() {
                 <button onClick={()=>deletetask(t.ID)} className='button' type='submit'>Удалить</button>
                 <EditDropdown 
                       task={t}
-                      onEdit={(task) => console.log('Редактирование:', task)}
+                      onEdit={fetchTasks}
                       onDelete={(task) => deletetask(task)}
                     />
                     </div>

@@ -61,10 +61,13 @@ func Updatetask(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
-	if err := db.UpdateTask(id, task); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+	if err := ctx.BindJSON(&task); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
 	} else {
+		db.UpdateTask(id, task)
 		ctx.JSON(http.StatusOK, task)
+
 	}
 
 }
