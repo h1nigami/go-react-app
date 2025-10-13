@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import './EditDropdown.css';
 import { updateTask } from "../api";
 
-function EditMenu({task, open, setOpen, onEdit}){
+function EditTitleMenu({task, open, setOpen, onEdit}){
   const menuRef = useRef();
   const [newTask, setNewTask] = useState(task.Title)
 
@@ -69,7 +69,7 @@ export default function EditDropdown({ onEdit, onDelete, task }) {
       {open && (
         <div className="dropdown-menu">
           <button onClick={() => setEditOpen(!editOpen)}>Изменить задачу</button>       
-          <EditMenu onEdit={()=> onEdit(task)} task={task} open={editOpen} setOpen={setEditOpen}/>
+          <EditTitleMenu onEdit={()=> onEdit(task)} task={task} open={editOpen} setOpen={setEditOpen}/>
           <button onClick={()=> onEdit(task)}>Изменить приоритет</button>
           <button onClick={() => onDelete(task.ID)}>Удалить</button>
         </div>
