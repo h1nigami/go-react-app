@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import './EditDropdown.css';
-import { updateTask } from "../api";
+import '../styles/EditDropdown.css';
+import { updateTask } from "../api/apiTask";
 
 function EditTitleMenu({task, open, setOpen, onEdit}){
   const menuRef = useRef();

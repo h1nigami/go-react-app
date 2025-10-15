@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/glebarez/sqlite"
-	"github.com/h1nigami/go-react-app/backend/internal/models"
+	"github.com/h1nigami/go-react-app/backend/task/internal/models"
 	"gorm.io/gorm"
 )
 
@@ -26,7 +26,6 @@ func NewConnection(db_name string) DB {
 
 func (d *DB) createTables() {
 	d.pool.AutoMigrate(&models.Task{})
-	d.pool.AutoMigrate(&models.User{})
 }
 
 func (d *DB) CreateTask(task *models.Task) {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/h1nigami/go-react-app/backend/internal/handlers"
+	"github.com/h1nigami/go-react-app/backend/task/internal/handlers"
 )
 
 func main() {

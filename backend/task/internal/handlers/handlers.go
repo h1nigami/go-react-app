@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/h1nigami/go-react-app/backend/internal/database"
-	"github.com/h1nigami/go-react-app/backend/internal/models"
+	"github.com/h1nigami/go-react-app/backend/task/internal/database"
+	"github.com/h1nigami/go-react-app/backend/task/internal/models"
 )
 
 var db *database.DB = &database.DataBase
@@ -15,7 +15,8 @@ var db *database.DB = &database.DataBase
 func AllTask(ctx *gin.Context) {
 	tasks, err := db.GetTasks()
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": err})
+		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err})
+		return
 	}
 	ctx.JSON(http.StatusOK, tasks)
 	fmt.Printf("Айпи клиента %v\n", ctx.ClientIP())

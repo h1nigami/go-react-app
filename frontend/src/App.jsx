@@ -1,6 +1,6 @@
-import './App.css';
+import './styles/App.css';
 import { useEffect, useState } from 'react';
-import { createTask, deleteTask, getTask } from './api';
+import { createTask, deleteTask, getTask } from './api/apiTask';
 import {motion, AnimatePresence} from 'framer-motion';
 import EditDropdown from './components/editDropDown';
 
