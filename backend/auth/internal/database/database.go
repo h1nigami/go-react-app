@@ -48,4 +48,4 @@ func (d *DB) DeleteUser(id uint) models.User {
 	return user
 }
 
-var db DB = NewConnection("auth.db")
+var Db DB = NewConnection("auth.db")

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { createTask, deleteTask, getTask } from './api/apiTask';
 import {motion, AnimatePresence} from 'framer-motion';
 import EditDropdown from './components/editDropDown';
+import AuthForm from './components/authForm';
 
 function App() {
   
@@ -36,6 +37,8 @@ function App() {
   }
 
   return (
+    <div>
+      <AuthForm />
     <div className='todo-card'>
       <h1>Tasks</h1>
       <form onSubmit={handleSubmit} style={{display: 'flex',
@@ -84,6 +87,7 @@ function App() {
           ))}
         </AnimatePresence>
       </ul>
+    </div>
     </div>
   );
 }
