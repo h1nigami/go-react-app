@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/glebarez/sqlite"
+	"github.com/h1nigami/go-react-app/backend/auth/internal/config"
 	"github.com/h1nigami/go-react-app/backend/auth/internal/models"
 	"gorm.io/gorm"
 )
@@ -48,4 +49,6 @@ func (d *DB) DeleteUser(id uint) models.User {
 	return user
 }
 
-var Db DB = NewConnection("auth.db")
+var cfg = config.MustLoad()
+
+var Db DB = NewConnection(cfg.StoragePath)

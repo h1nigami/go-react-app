@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -23,5 +25,15 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 	r.POST("/auth", handlers.AuthHandler)
-	r.Run("localhost:8081")
+	srv := &http.Server{
+		Addr:         cfg.Addres,
+		Handler:      r,
+		ReadTimeout:  cfg.Timeout,
+		WriteTimeout: cfg.Timeout,
+		IdleTimeout:  cfg.IdleTimeout,
+	}
+
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("Ошибка при запуске сервера %s", err)
+	}
 }

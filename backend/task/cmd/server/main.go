@@ -1,16 +1,20 @@
 package main
 
 import (
+	"log"
 	"log/slog"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/h1nigami/go-react-app/backend/task/internal/config"
 	"github.com/h1nigami/go-react-app/backend/task/internal/handlers"
 )
 
 func main() {
+	cfg := config.MustLoad()
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1"},
@@ -25,7 +29,17 @@ func main() {
 	router.POST("/task", handlers.CreateTask)
 	router.DELETE("/task/:id", handlers.DeleteTask)
 	router.PATCH("task/:id", handlers.Updatetask)
-	router.Run("localhost:8000")
+	srv := &http.Server{
+		Addr:         cfg.Addres,
+		Handler:      router,
+		ReadTimeout:  cfg.Timeout,
+		WriteTimeout: cfg.Timeout,
+		IdleTimeout:  cfg.IdleTimeout,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		log.Fatalf("Ошибка при запуске сервера: %s", err)
+	}
 }
 
 const (
