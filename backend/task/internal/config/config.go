@@ -12,11 +12,11 @@ import (
 type Config struct {
 	Env         string `yaml:"env" env-default:"local"`
 	StoragePath string `yaml:"storage_path" env-required:"true"`
-	HttpServer
+	HttpServer  `yaml:"http_server"`
 }
 
 type HttpServer struct {
-	Addres      string        `yaml:"addres"`
+	Addres      string        `yaml:"addres" env-required:"true"`
 	Timeout     time.Duration `yaml:"idle_timeout" env-default:"4s"`
 	IdleTimeout time.Duration `yaml:"idletimeout" env-defaulg:"60s"`
 }
@@ -28,6 +28,10 @@ func MustLoad() *Config {
 	CONFIG_PATH := os.Getenv("CONFIG_PATH")
 	if CONFIG_PATH == "" {
 		log.Fatal("путь до конфига не задан")
+	}
+
+	if _, err := os.Stat(CONFIG_PATH); os.IsNotExist(err) {
+		log.Fatalf("config file %s is not exist", CONFIG_PATH)
 	}
 
 	var cfg Config
