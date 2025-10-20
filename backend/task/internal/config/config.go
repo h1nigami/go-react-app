@@ -17,8 +17,8 @@ type Config struct {
 
 type HttpServer struct {
 	Addres      string        `yaml:"addres" env-required:"true"`
-	Timeout     time.Duration `yaml:"idle_timeout" env-default:"4s"`
-	IdleTimeout time.Duration `yaml:"idletimeout" env-defaulg:"60s"`
+	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
+	IdleTimeout time.Duration `yaml:"idle_timeout" env-defaulg:"60s"`
 }
 
 func MustLoad() *Config {
