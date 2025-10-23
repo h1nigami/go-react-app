@@ -10,7 +10,7 @@ import (
 	"github.com/h1nigami/go-react-app/backend/task/internal/models"
 )
 
-var db *database.DB = &database.DataBase
+var db *database.DB = database.DataBase
 
 func AllTask(ctx *gin.Context) {
 	tasks, err := db.GetTasks()

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -9,13 +10,20 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/h1nigami/go-react-app/backend/task/internal/config"
+	"github.com/h1nigami/go-react-app/backend/task/internal/database"
 	"github.com/h1nigami/go-react-app/backend/task/internal/handlers"
 )
 
 func main() {
+
+	if err := database.InitDatabase(); err != nil {
+		log.Fatal(err)
+	}
+
 	cfg := config.MustLoad()
 	log := setUpLogger(cfg.Env)
-	log.Info("микросервис для таск стартует", slog.String("env", cfg.Env), slog.String("addr", cfg.Addres))
+	log.Info("микросервис для таск стартует", slog.String("env", cfg.Env), slog.String("addr", cfg.Addres), slog.Any("storage_path", cfg.StoragePath))
+
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1"},

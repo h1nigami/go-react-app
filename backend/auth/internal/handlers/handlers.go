@@ -19,7 +19,7 @@ func AuthHandler(c *gin.Context) {
 	}
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, map[string]any{"error": err})
 		return
 	}
 	user.Password = string(hashedPass)
