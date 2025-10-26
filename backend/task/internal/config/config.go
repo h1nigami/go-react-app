@@ -11,6 +11,7 @@ import (
 
 type Config struct {
 	Env         string `yaml:"env" env-default:"local"`
+	StorageType string `yaml:"storage_type" env-default:"sqlite"`
 	StoragePath string `yaml:"storage_path" env-required:"true"`
 	HttpServer  `yaml:"http_server"`
 }
@@ -18,7 +19,7 @@ type Config struct {
 type HttpServer struct {
 	Addres      string        `yaml:"addres" env-required:"true"`
 	Timeout     time.Duration `yaml:"timeout" env-default:"4s"`
-	IdleTimeout time.Duration `yaml:"idle_timeout" env-defaulg:"60s"`
+	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60s"`
 }
 
 func MustLoad() *Config {

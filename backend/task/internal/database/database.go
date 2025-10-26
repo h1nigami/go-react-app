@@ -10,16 +10,25 @@ import (
 	"gorm.io/gorm"
 )
 
+type TaskStorage interface {
+	CreateTask(task *models.Task)
+	GetTasks() ([]models.Task, error)
+	GetTaskByid(id int) (models.Task, error)
+	Createtask(task *models.Task)
+	DeleteTask(id int) models.Task
+	UpdateTask(id int, task models.Task) error
+}
+
 type DB struct {
 	pool *gorm.DB
 }
 
-func NewConnection(db_name string) (*DB, error) {
-	const op = "database.database.NewConnection"
+func NewSqliteConnection(db_name string) (*DB, error) {
+	const op = "database.database.NewSqliteConnection"
 
 	db, err := gorm.Open(sqlite.Open(db_name), &gorm.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("Ошибка в функции %v: %v", op, err)
+		return nil, fmt.Errorf("ошибка в функции %v: %v", op, err)
 	}
 	log.Println("подключение к бд успешно")
 	data := DB{pool: db}
@@ -75,11 +84,11 @@ func (d *DB) UpdateTask(id int, task models.Task) error {
 }
 
 var cfg *config.Config = config.MustLoad()
-var DataBase *DB
+var DataBase TaskStorage
 
-func InitDatabase() error {
+func InitSqliteDatabase() error {
 	const op = "InitDatabase in task service"
-	db, err := NewConnection(cfg.StoragePath)
+	db, err := NewSqliteConnection(cfg.StoragePath)
 	if err != nil {
 		return fmt.Errorf("%v : %v", op, err)
 	}

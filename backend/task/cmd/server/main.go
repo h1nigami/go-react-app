@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -15,13 +14,24 @@ import (
 )
 
 func main() {
-
-	if err := database.InitDatabase(); err != nil {
-		log.Fatal(err)
-	}
-
 	cfg := config.MustLoad()
 	log := setUpLogger(cfg.Env)
+	var storage database.TaskStorage
+
+	switch cfg.StorageType {
+	case "sqlite":
+		err := database.InitSqliteDatabase()
+		if err != nil {
+			log.Error("Ошибка инициализации sqlite базы данных", slog.Any("error", err))
+		}
+		storage = database.DataBase
+		log.Info("Используется sqlite база данных")
+	default:
+		log.Error("не получилось задать тип базы данных")
+	}
+
+	handlers.SetStorage(storage)
+
 	log.Info("микросервис для таск стартует", slog.String("env", cfg.Env), slog.String("addr", cfg.Addres), slog.Any("storage_path", cfg.StoragePath))
 
 	r := gin.Default()

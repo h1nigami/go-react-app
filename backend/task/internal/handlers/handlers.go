@@ -10,10 +10,14 @@ import (
 	"github.com/h1nigami/go-react-app/backend/task/internal/models"
 )
 
-var db *database.DB = database.DataBase
+var storage database.TaskStorage
+
+func SetStorage(s database.TaskStorage) {
+	storage = s
+}
 
 func AllTask(ctx *gin.Context) {
-	tasks, err := db.GetTasks()
+	tasks, err := storage.GetTasks()
 	if err != nil {
 		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err})
 		return
@@ -28,7 +32,7 @@ func GetTaskById(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
-	task, e := db.GetTaskByid(id)
+	task, e := storage.GetTaskByid(id)
 	if e != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": e})
 	}
@@ -40,7 +44,7 @@ func CreateTask(ctx *gin.Context) {
 	if err := ctx.BindJSON(&task); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 	} else {
-		db.CreateTask(&task)
+		storage.CreateTask(&task)
 		ctx.JSON(http.StatusCreated, task)
 	}
 }
@@ -51,7 +55,7 @@ func DeleteTask(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
-	task := db.DeleteTask(id)
+	task := storage.DeleteTask(id)
 	ctx.JSON(http.StatusOK, gin.H{"deleted": task})
 }
 
@@ -66,7 +70,7 @@ func Updatetask(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	} else {
-		db.UpdateTask(id, task)
+		storage.UpdateTask(id, task)
 		ctx.JSON(http.StatusOK, task)
 
 	}
