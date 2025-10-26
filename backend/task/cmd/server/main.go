@@ -26,6 +26,8 @@ func main() {
 		}
 		storage = database.DataBase
 		log.Info("Используется sqlite база данных")
+	case "postgresql":
+		panic("постгрес еще не реализован")
 	default:
 		log.Error("не получилось задать тип базы данных")
 	}
@@ -42,7 +44,7 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
-	}))
+	}), gin.Recovery())
 	r.GET("/task", handlers.AllTask)
 	r.GET("/task/:id", handlers.GetTaskById)
 	r.POST("/task", handlers.CreateTask)

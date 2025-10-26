@@ -29,12 +29,12 @@ func AllTask(ctx *gin.Context) {
 func GetTaskById(ctx *gin.Context) {
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
 	task, e := storage.GetTaskByid(id)
 	if e != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": e})
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": e})
 	}
 	ctx.JSON(http.StatusOK, task)
 }
@@ -42,7 +42,7 @@ func GetTaskById(ctx *gin.Context) {
 func CreateTask(ctx *gin.Context) {
 	var task models.Task
 	if err := ctx.BindJSON(&task); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 	} else {
 		storage.CreateTask(&task)
 		ctx.JSON(http.StatusCreated, task)
@@ -63,11 +63,11 @@ func Updatetask(ctx *gin.Context) {
 	var task models.Task
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
 	if err := ctx.BindJSON(&task); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	} else {
 		storage.UpdateTask(id, task)
