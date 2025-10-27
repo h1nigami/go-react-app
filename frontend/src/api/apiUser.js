@@ -6,6 +6,7 @@ export async function createUser(user) {
             method: 'POST',
             headers: {"Content-Type":"application/json"},
             body: JSON.stringify(user),
+            credentials: "include"
         }
     );
     if (!responce.ok) {

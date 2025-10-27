@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/h1nigami/go-react-app/backend/auth/internal/config"
 	"github.com/h1nigami/go-react-app/backend/auth/internal/handlers"
+	"github.com/h1nigami/go-react-app/backend/auth/internal/midleware"
 )
 
 func main() {
@@ -19,11 +20,11 @@ func main() {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000", "http://127.0.0.1"},
 		AllowMethods:     []string{"GET", "POST", "OPTIONS", "PUT", "DELETE", "PATCH"},
-		AllowHeaders:     []string{"Origin", "Content-Type"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
-	}))
+	}), midleware.AuthMiddleware())
 	r.POST("/auth", handlers.AuthHandler)
 	srv := &http.Server{
 		Addr:         cfg.Addres,
