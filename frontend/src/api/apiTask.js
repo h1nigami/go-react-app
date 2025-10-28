@@ -18,7 +18,8 @@ export async function createTask(task) {
     const response = await fetch(`${API_URL}/task`, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(task)
+        body: JSON.stringify(task),
+        credentials: "include"
     });
     if (!response.ok) throw new Error('failed to create task');
     return response.json();
@@ -26,7 +27,8 @@ export async function createTask(task) {
 
 export async function deleteTask(id) {
     const responce = await fetch(`${API_URL}/task/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        credentials: "include"
     });
     if (!responce.ok) throw new Error('failed to delete task');
     return responce.json();
@@ -38,7 +40,8 @@ export async function updateTask(id, updatedTask){
         headers: {
             'Content-Type':'application/json',
         },
-        body: JSON.stringify(updatedTask)
+        body: JSON.stringify(updatedTask),
+        credentials: "include"
     });
     if (!responce.ok) throw new Error('failed to update task');
     return responce.json()

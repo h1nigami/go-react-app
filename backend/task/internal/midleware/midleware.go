@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/h1nigami/go-react-app/backend/task/internal/config"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
@@ -14,11 +15,11 @@ func AuthMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "no token"})
 			return
 		}
-
+		var cfg *config.Config = config.MustLoad()
 		// Проверка токена
 		claims := jwt.MapClaims{}
 		parsedToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte("yourSecretKey"), nil
+			return []byte(cfg.Secret_key), nil
 		})
 		if err != nil || !parsedToken.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})

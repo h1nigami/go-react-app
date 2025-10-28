@@ -13,6 +13,7 @@ type Config struct {
 	Env         string `yaml:"env" env-default:"local"`
 	StorageType string `yaml:"storage_type" env-default:"sqlite"`
 	StoragePath string `yaml:"storage_path" env-required:"true"`
+	Secret_key  string `yaml:"secret_key" env-required:"true"`
 	HttpServer  `yaml:"http_server"`
 }
 
