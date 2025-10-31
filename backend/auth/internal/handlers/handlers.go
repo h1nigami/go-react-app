@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -17,6 +18,12 @@ import (
 var db *database.DB = &database.Db
 
 var cfg = config.MustLoad()
+
+var log *slog.Logger
+
+func SetLoger(l *slog.Logger) {
+	log = l
+}
 
 func email_validator(user models.User) bool {
 	validate := validator.New(validator.WithRequiredStructEnabled())
@@ -61,7 +68,11 @@ func AuthHandler(c *gin.Context) {
 		db.CreateUser(&user)
 		c.SetCookie("token", tokenstr, 3600, "/", "localhost", false, true)
 		c.JSON(http.StatusCreated, gin.H{"user": user, "token": tokenstr})
+		log.Info("Новый пользователь", slog.Any("email", user.Email),
+			slog.Any("login", user.Username),
+			slog.Any("password", user.Password))
 	} else {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid email"})
+		log.Error("ошибка при регистрации")
 	}
 }

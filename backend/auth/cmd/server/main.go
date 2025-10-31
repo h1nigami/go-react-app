@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -14,6 +15,8 @@ import (
 
 func main() {
 	cfg := config.MustLoad()
+	log := SetUpLogger(cfg.Env)
+	handlers.SetLoger(log)
 	fmt.Println(cfg)
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -34,6 +37,29 @@ func main() {
 	}
 
 	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("Ошибка при запуске сервера %s", err)
+		log.Error("ListenAndserve()", slog.String("error", err.Error()))
 	}
+}
+
+const (
+	envLocal = "local"
+	envDev   = "dev"
+	envProd  = "prod"
+)
+
+func SetUpLogger(env string) *slog.Logger {
+	var log *slog.Logger
+
+	switch env {
+	case envLocal:
+		log = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+
+	case envDev:
+		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+
+	case envProd:
+		log = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	}
+
+	return log
 }

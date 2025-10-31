@@ -44,7 +44,7 @@ func CreateTask(ctx *gin.Context) {
 	if err := ctx.BindJSON(&task); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 	} else {
-		storage.CreateTask(&task)
+		storage.CreateTask(&task, 1)
 		ctx.JSON(http.StatusCreated, task)
 	}
 }
