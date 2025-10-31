@@ -49,6 +49,12 @@ func (d *DB) DeleteUser(id uint) models.User {
 	return user
 }
 
+func (d *DB) GetUserByEmailOrUsername(identifier string) (models.User, error) {
+	var user models.User
+	result := d.pool.Where("email = ? OR username = ?", identifier, identifier).First(&user)
+	return user, result.Error
+}
+
 var cfg = config.MustLoad()
 
 var Db DB = NewConnection(cfg.StoragePath)
