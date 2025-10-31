@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createUser } from "../api/apiUser";
+import {  createUserAndAuth } from "../api/apiUser";
 
 
 
@@ -26,7 +26,8 @@ function AuthForm(){
         e.preventDefault()
         try {
             const user = {"email":newMail, "username":newLogin, "password":newPassword};
-            await createUser(user);
+            await createUserAndAuth(user);
+            setOpen(false);
         } catch (error) {
             console.log(error);
         }

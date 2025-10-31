@@ -20,7 +20,7 @@ type LoginRequest struct {
 	Password   string `json:"password" binding:"required"`
 }
 
-var db *database.DB = &database.Db
+var db = &database.Db
 
 var cfg = config.MustLoad()
 
@@ -51,31 +51,45 @@ func AuthHandler(c *gin.Context) {
 	var user models.User
 
 	if err := c.BindJSON(&user); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	ok := email_validator(user)
 	if ok {
+		// Check if user already exists
+		_, err := db.GetUserByEmailOrUsername(user.Email)
+		if err == nil {
+			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "user already exists"})
+			return
+		}
+		_, err = db.GetUserByEmailOrUsername(user.Username)
+		if err == nil {
+			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "username already exists"})
+			return
+		}
+
 		hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 		user.Password = string(hashedPass)
+		db.CreateUser(&user)
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"sub": user.Username,
-			"exp": time.Now().Add(1 * time.Hour).Unix(),
+			"sub":     user.Username,
+			"exp":     time.Now().Add(1 * time.Hour).Unix(),
+			"user_id": user.ID,
+			"email":   user.Email,
 		})
 		tokenstr, err := token.SignedString([]byte(cfg.Secret_key))
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"failed to create token": err})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "failed to create token"})
+			return
 		}
-		db.CreateUser(&user)
 		c.SetCookie("token", tokenstr, 3600, "/", "localhost", false, true)
 		c.JSON(http.StatusCreated, gin.H{"user": user, "token": tokenstr})
 		log.Info("Новый пользователь", slog.Any("email", user.Email),
-			slog.Any("login", user.Username),
-			slog.Any("password", user.Password))
+			slog.Any("login", user.Username))
 	} else {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid email"})
 		log.Error("ошибка при регистрации")
@@ -114,7 +128,7 @@ func LoginHandler(c *gin.Context) {
 
 	c.SetCookie("token", tokenstr, 3600, "/", "localhost", false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "login successful", "token": tokenstr})
-	log.Info("Пользователь вошел в систему", slog.Any("username", user.Username))
+	log.Info("Пользователь вошел в систему", slog.String("username", user.Username))
 }
 
 func AuthMiddleware() gin.HandlerFunc {

@@ -12,7 +12,7 @@ import (
 
 type TaskStorage interface {
 	CreateTask(task *models.Task, user_id int)
-	GetTasks() ([]models.Task, error)
+	GetTasks(user_id any) ([]models.Task, error)
 	GetTaskByid(id int) (models.Task, error)
 	DeleteTask(id int) models.Task
 	UpdateTask(id int, task models.Task) error
@@ -39,9 +39,9 @@ func (d *DB) createTables() {
 	d.pool.AutoMigrate(&models.Task{})
 }
 
-func (d *DB) GetTasks() ([]models.Task, error) {
+func (d *DB) GetTasks(user_id any) ([]models.Task, error) {
 	var tasks []models.Task
-	result := d.pool.Find(&tasks)
+	result := d.pool.Where("user_id = ?", user_id).Find(&tasks)
 	return tasks, result.Error
 }
 

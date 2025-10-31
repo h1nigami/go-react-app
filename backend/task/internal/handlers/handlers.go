@@ -16,62 +16,63 @@ func SetStorage(s database.TaskStorage) {
 	storage = s
 }
 
-func AllTask(ctx *gin.Context) {
-	tasks, err := storage.GetTasks()
+func AllTask(c *gin.Context) {
+	uid, _ := c.Get("user_id")
+	tasks, err := storage.GetTasks(uid)
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
-	ctx.JSON(http.StatusOK, tasks)
-	fmt.Printf("Айпи клиента %v\n", ctx.ClientIP())
+	c.JSON(http.StatusOK, tasks)
+	fmt.Printf("Айди клиента %v\n", uid)
 }
 
-func GetTaskById(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+func GetTaskById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
 	task, e := storage.GetTaskByid(id)
 	if e != nil {
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": e})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": e})
 	}
-	ctx.JSON(http.StatusOK, task)
+	c.JSON(http.StatusOK, task)
 }
 
-func CreateTask(ctx *gin.Context) {
+func CreateTask(c *gin.Context) {
 	var task models.Task
-	if err := ctx.BindJSON(&task); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
+	if err := c.BindJSON(&task); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 	} else {
 		storage.CreateTask(&task, 1)
-		ctx.JSON(http.StatusCreated, task)
+		c.JSON(http.StatusCreated, task)
 	}
 }
 
-func DeleteTask(ctx *gin.Context) {
-	id, err := strconv.Atoi(ctx.Param("id"))
+func DeleteTask(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
 	task := storage.DeleteTask(id)
-	ctx.JSON(http.StatusOK, gin.H{"deleted": task})
+	c.JSON(http.StatusOK, gin.H{"deleted": task})
 }
 
-func Updatetask(ctx *gin.Context) {
+func Updatetask(c *gin.Context) {
 	var task models.Task
-	id, err := strconv.Atoi(ctx.Param("id"))
+	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
-	if err := ctx.BindJSON(&task); err != nil {
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
+	if err := c.BindJSON(&task); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	} else {
 		storage.UpdateTask(id, task)
-		ctx.JSON(http.StatusOK, task)
+		c.JSON(http.StatusOK, task)
 
 	}
 

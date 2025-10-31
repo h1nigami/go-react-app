@@ -25,7 +25,7 @@ func NewConnection(db_addrs string) DB {
 }
 
 func (d *DB) CreateUser(user *models.User) {
-	d.pool.Create(&user)
+	d.pool.Create(user)
 }
 
 func (d *DB) GetUsers() ([]models.User, error) {
