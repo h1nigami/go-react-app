@@ -25,7 +25,7 @@ type HttpServer struct {
 
 func MustLoad() *Config {
 	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("error: %v", err)
+		log.Fatalf("error: %v", err.Error())
 	}
 	CONFIG_PATH := os.Getenv("CONFIG_PATH")
 	if CONFIG_PATH == "" {

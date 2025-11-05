@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -62,12 +63,7 @@ func AuthHandler(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "user already exists"})
 			return
 		}
-		_, err = db.GetUserByEmailOrUsername(user.Username)
-		if err == nil {
-			c.AbortWithStatusJSON(http.StatusConflict, gin.H{"error": "username already exists"})
-			return
-		}
-
+		user.Password = strings.TrimSpace(user.Password)
 		hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -86,8 +82,9 @@ func AuthHandler(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "failed to create token"})
 			return
 		}
+		ur := models.UserResponce{Email: user.Email, Username: user.Username}
 		c.SetCookie("token", tokenstr, 3600, "/", "localhost", false, true)
-		c.JSON(http.StatusCreated, gin.H{"user": user, "token": tokenstr})
+		c.JSON(http.StatusCreated, gin.H{"user": ur, "token": tokenstr})
 		log.Info("Новый пользователь", slog.Any("email", user.Email),
 			slog.Any("login", user.Username))
 	} else {
@@ -102,16 +99,18 @@ func LoginHandler(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	req.Password = strings.TrimSpace(req.Password)
+	req.Identifier = strings.TrimSpace(req.Identifier)
 	user, err := db.GetUserByEmailOrUsername(req.Identifier)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error on GetUserByEmailOrUsername": "invalid credentials"})
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		log.Info("CompareHashAndPassword", slog.String("error", err.Error()))
+		log.Info("info", slog.Any("given", req.Password), slog.Any("expected", user.Password))
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error bcrypt": err.Error()})
 		return
 	}
 
@@ -134,7 +133,7 @@ func LoginHandler(c *gin.Context) {
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := c.Cookie("token")
-		if err != nil {
+		if err != http.ErrNoCookie {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "no token"})
 			return
 		}

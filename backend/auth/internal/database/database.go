@@ -25,7 +25,7 @@ func NewConnection(db_addrs string) DB {
 }
 
 func (d *DB) CreateUser(user *models.User) {
-	d.pool.Create(user)
+	d.pool.Create(&user)
 }
 
 func (d *DB) GetUsers() ([]models.User, error) {
@@ -43,18 +43,21 @@ func (d *DB) GetUserByID(id uint) (models.User, error) {
 func (d *DB) DeleteUser(id uint) models.User {
 	user, err := d.GetUserByID(id)
 	if err != nil {
-		log.Fatalf("Ошибка при удалении пользователя: ", err)
+		log.Fatalf("Ошибка при удалении пользователя: %v", err)
 	}
 	d.pool.Delete(&user)
 	return user
 }
 
-func (d *DB) GetUserByEmailOrUsername(identifier string) (models.User, error) {
+func (d *DB) GetUserByEmailOrUsername(identifier string) (*models.User, error) {
 	var user models.User
 	result := d.pool.Where("email = ? OR username = ?", identifier, identifier).First(&user)
-	return user, result.Error
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
 }
 
 var cfg = config.MustLoad()
 
-var Db DB = NewConnection(cfg.StoragePath)
+var Db = NewConnection(cfg.StoragePath)

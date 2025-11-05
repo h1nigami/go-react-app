@@ -27,7 +27,7 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-	r.POST("/auth", handlers.AuthHandler)
+	r.POST("/register", handlers.AuthHandler)
 	r.POST("/login", handlers.LoginHandler)
 	r.GET("/verify", handlers.AuthMiddleware(), handlers.VerifyHandler)
 	srv := &http.Server{

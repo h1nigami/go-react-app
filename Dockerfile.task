@@ -26,6 +26,9 @@ WORKDIR /root/
 # Copy the binary from builder stage
 COPY --from=builder /app/task/cmd/server/task-server .
 
+# Copy config files
+COPY backend/task/local.yaml /app/local.yaml
+
 # Expose port
 EXPOSE 8081
 

@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   auth:
@@ -8,9 +8,7 @@ services:
     ports:
       - "8082:8082"
     environment:
-      - CONFIG_PATH=/app/config/auth.yaml
-      - STORAGE_PATH=/app/data/users.db
-      - SECRET_KEY=your-secret-key-here
+      - CONFIG_PATH=./local.yaml
     volumes:
       - ./backend/auth/internal/config:/app/config
       - auth_data:/app/data
@@ -24,10 +22,7 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - CONFIG_PATH=/app/config/task.yaml
-      - STORAGE_PATH=/app/data/tasks.db
-      - SECRET_KEY=your-secret-key-here
-      - ADDRES=:8081
+      - CONFIG_PATH=./local.yaml
     volumes:
       - ./backend/task/internal/config:/app/config
       - task_data:/app/data

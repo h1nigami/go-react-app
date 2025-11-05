@@ -23,11 +23,9 @@ type HttpServer struct {
 }
 
 func MustLoad() *Config {
-
 	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("не получается загрузить переменные окружения: %s", err)
+		log.Fatalf("error: %s", err.Error())
 	}
-
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		log.Fatal("CONFIG_PATH is not set")

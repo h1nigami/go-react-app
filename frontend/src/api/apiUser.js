@@ -3,7 +3,7 @@ export async function createUserAndAuth(user) {
     try {
         // 1. Регистрация
         console.log("Starting registration...");
-        const registerResponse = await fetch(`${API_BASE_URL}/auth`, {
+        const registerResponse = await fetch(`${API_BASE_URL}/register`, {
             method: 'POST',
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(user),

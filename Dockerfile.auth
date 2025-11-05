@@ -26,6 +26,9 @@ WORKDIR /root/
 # Copy the binary from builder stage
 COPY --from=builder /app/auth/cmd/server/auth-server .
 
+# Copy config files
+COPY backend/auth/local.yaml /app/local.yaml
+
 # Expose port
 EXPOSE 8082
 
