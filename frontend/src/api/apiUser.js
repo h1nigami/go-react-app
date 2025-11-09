@@ -66,3 +66,22 @@ export async function createUserAndAuth(user) {
         throw error;
     }
 }
+
+export async function logout() {
+    try {
+        const logoutResponse = await fetch(`${API_BASE_URL}/logout`, {
+            method: 'GET',
+            credentials: "include"
+        }); 
+        if (logoutResponse.ok) {
+            console.log("Logout successful");
+            return true;
+        } else {
+            console.log("Logout failed");
+            return false;
+        }
+    } catch (error) {
+        console.error("Error in logout:", error);
+        throw error;
+    }
+}

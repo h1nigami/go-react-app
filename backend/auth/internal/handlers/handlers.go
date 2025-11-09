@@ -84,9 +84,11 @@ func AuthHandler(c *gin.Context) {
 		}
 		ur := models.UserResponce{Email: user.Email, Username: user.Username}
 		c.SetCookie("token", tokenstr, 3600, "/", "localhost", false, true)
-		c.JSON(http.StatusCreated, gin.H{"user": ur, "token": tokenstr})
+		c.JSON(http.StatusCreated, gin.H{"user": ur})
+		rc, _ := c.Cookie("token")
 		log.Info("Новый пользователь", slog.Any("email", user.Email),
-			slog.Any("login", user.Username))
+			slog.Any("login", user.Username),
+			slog.String("token", rc))
 	} else {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid email"})
 		log.Error("ошибка при регистрации")
@@ -125,7 +127,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("token", tokenstr, 3600, "/", "localhost", false, true)
+	c.SetCookie("token", tokenstr, 3600, "/", "localhost", true, false)
 	c.JSON(http.StatusOK, gin.H{"message": "login successful", "token": tokenstr})
 	log.Info("Пользователь вошел в систему", slog.String("username", user.Username))
 }
@@ -133,7 +135,7 @@ func LoginHandler(c *gin.Context) {
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := c.Cookie("token")
-		if err != http.ErrNoCookie {
+		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "no token"})
 			return
 		}
@@ -162,4 +164,9 @@ func VerifyHandler(c *gin.Context) {
 
 	username, _ := c.Get("username")
 	c.JSON(http.StatusOK, gin.H{"user_id": userID, "username": username})
+}
+
+func LogOutHandler(c *gin.Context) {
+	c.SetCookie("token", "", -1, "/", "localhost", true, false)
+	c.JSON(http.StatusOK, gin.H{"message": "logout successful"})
 }

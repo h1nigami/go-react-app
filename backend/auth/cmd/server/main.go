@@ -30,6 +30,7 @@ func main() {
 	r.POST("/register", handlers.AuthHandler)
 	r.POST("/login", handlers.LoginHandler)
 	r.GET("/verify", handlers.AuthMiddleware(), handlers.VerifyHandler)
+	r.GET("/logout", handlers.AuthMiddleware(), handlers.LogOutHandler)
 	srv := &http.Server{
 		Addr:         cfg.Addres,
 		Handler:      r,
