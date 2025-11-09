@@ -29,7 +29,7 @@ function AuthForm() {
       password: newPassword,
     };
     try {
-      await createUserAndAuth(payload);
+      await createUserAndAuth(payload, formMode);
       setOpen(false);
       setUser(payload);
       setMail("");
@@ -42,8 +42,11 @@ function AuthForm() {
   };
 
   const handleLogout = async () => {
-    await logout();
-    setUser(null);
+    let isOut = await logout();
+    if (isOut) {
+      setUser(null);
+    };
+    setOpen(false);
   };
 
   return (
