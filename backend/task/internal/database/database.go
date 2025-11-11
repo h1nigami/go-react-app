@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -16,6 +17,23 @@ type TaskStorage interface {
 	GetTaskByid(id int) (models.Task, error)
 	DeleteTask(id int) models.Task
 	UpdateTask(id int, task models.Task) error
+	UpdateTaskPriority(id int, task models.Task) error
+}
+
+func (d *DB) UpdateTaskPriority(id int, task models.Task) error {
+	const op = "database.UpdateTaskPriority"
+	err := fmt.Sprintf("no rows detected on %s", op)
+	result := d.pool.Model(&models.Task{}).Where("ID = ?", id).Updates(task)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return errors.New(err)
+	}
+
+	return nil
 }
 
 type DB struct {
