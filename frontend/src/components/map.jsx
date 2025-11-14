@@ -168,21 +168,22 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
       document.head.appendChild(script);
     };
 
-    const initMap = () => {
-      if (!mapContainer.current || !window.ymaps) return;
+const initMap = () => {
+  if (!mapContainer.current) return;
 
-      if (!mapInstance.current) {
-        mapInstance.current = new window.ymaps.Map(mapContainer.current, {
-          center: [55.7522, 37.6156],
-          zoom: 10,
-          controls: ['zoomControl', 'typeSelector', 'fullscreenControl']
-        });
+  const ymaps = window.ymaps;
+  if (!ymaps || typeof ymaps.Map !== 'function') return;
 
-      }
-      
-      refreshMarkers();
-    };
+  if (!mapInstance.current) {
+    mapInstance.current = new ymaps.Map(mapContainer.current, {
+      center: [55.7522, 37.6156],
+      zoom: 10,
+      controls: ['zoomControl', 'typeSelector', 'fullscreenControl']
+    });
+  }
 
+  refreshMarkers();
+};
     loadMaps();
 
     return () => {
