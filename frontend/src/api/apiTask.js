@@ -3,7 +3,10 @@
 const API_URL = 'http://localhost:8081'
 
 export async function getTask() {
-    const response = await fetch(`${API_URL}/task`);
+    const response = await fetch(`${API_URL}/task`,{
+        credentials: "include",
+        method: 'GET'
+    });
     if (!response.ok) throw new Error('failed to fetch task');
     return response.json();
 }

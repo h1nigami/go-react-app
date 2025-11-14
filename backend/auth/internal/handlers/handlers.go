@@ -128,6 +128,7 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	c.SetCookie("token", tokenstr, 3600, "/", "localhost", true, false)
+	c.SetCookie("user_id", fmt.Sprintf("%d", user.ID), 3600, "/", "localhost", true, false)
 	c.JSON(http.StatusOK, gin.H{"message": "login successful", "token": tokenstr})
 	log.Info("Пользователь вошел в систему", slog.String("username", user.Username))
 }
@@ -167,6 +168,7 @@ func VerifyHandler(c *gin.Context) {
 }
 
 func LogOutHandler(c *gin.Context) {
-	c.SetCookie("token", "", -1, "/", "localhost", true, true)
+	c.SetCookie("token", "", -1, "/", "localhost", false, true)
+	c.SetCookie("user_id", "", -1, "/", "localhost", true, false)
 	c.JSON(http.StatusOK, gin.H{"message": "logout successful"})
 }

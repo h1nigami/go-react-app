@@ -17,7 +17,11 @@ func SetStorage(s database.TaskStorage) {
 }
 
 func AllTask(c *gin.Context) {
-	uid, _ := c.Get("user_id")
+	uid, err := c.Cookie("user_id")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
 	tasks, err := storage.GetTasks(uid)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err})
@@ -42,10 +46,20 @@ func GetTaskById(c *gin.Context) {
 
 func CreateTask(c *gin.Context) {
 	var task models.Task
+	uidStr, err := c.Cookie("user_id")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "user id cookie not found"})
+		return
+	}
+	uid, err := strconv.Atoi(uidStr)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
+		return
+	}
 	if err := c.BindJSON(&task); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 	} else {
-		storage.CreateTask(&task, 1)
+		storage.CreateTask(&task, uid)
 		c.JSON(http.StatusCreated, task)
 	}
 }
@@ -73,7 +87,6 @@ func Updatetask(c *gin.Context) {
 	} else {
 		storage.UpdateTask(id, task)
 		c.JSON(http.StatusOK, task)
-
 	}
 
 }

@@ -1,6 +1,32 @@
 const API_BASE_URL = "http://localhost:8082";
 
 /**
+ * Проверяет текущий статус аутентификации пользователя
+ * @returns {Object|null} данные пользователя или null если не аутентифицирован
+ */
+export async function checkAuthStatus() {
+    try {
+        console.log("Checking authentication status...");
+        const response = await fetch(`${API_BASE_URL}/verify`, {
+            method: 'GET',
+            credentials: "include"
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log("User is authenticated:", data);
+            return data;
+        } else {
+            console.log("User is not authenticated");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error checking auth status:", error);
+        return null;
+    }
+}
+
+/**
  * Создает пользователя и выполняет аутентификацию
  * @param {Object} user - данные пользователя (email,username, password)
  * @param {string} mode - режим работы: "register" или "login"
@@ -44,6 +70,9 @@ export async function createUserAndAuth(user, mode) {
             console.log("Starting login...");
             await performLogin(user.username, user.password);
             console.log("Login successful");
+            
+            // 2. Проверяем статус после входа
+            return await checkAuthStatus();
             
         } catch (error) {
             console.error("Error in login:", error);

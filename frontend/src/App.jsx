@@ -4,26 +4,37 @@ import { createTask, deleteTask, getTask } from './api/apiTask';
 import {motion, AnimatePresence} from 'framer-motion';
 import EditDropdown from './components/editDropDown';
 import AuthForm from './components/authForm';
+import MapComponent from './components/map';
 
 function App() {
   
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [priority, setPriority] = useState('');
+  const [coordinates, setCoordinates] = useState({ x: '', y: '' });
+  const [address, setAddress] = useState('');
   
   useEffect(() => {
     getTask()
       .then(setTasks)
       .catch(err => console.error(err));
-  }, []); // ✅ теперь запрос один раз
+  }, []); 
 
-  const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newTask.trim()) return; // ✅ исправлено
-    const created = await createTask({ title: newTask, priority:priority });
+    if (!newTask.trim()) return;
+    const created = await createTask({ 
+      title: newTask, 
+      priority: priority,
+      x: coordinates.x ? parseFloat(coordinates.x) : null,
+      y: coordinates.y ? parseFloat(coordinates.y) : null,
+      addres: address
+    });
     setTasks(prev => [...prev, created]);
     setNewTask('');
-    setPriority('')
+    setPriority('');
+    setCoordinates({ x: '', y: '' });
+    setAddress('');
   };
 
  const deletetask = async (id) => {
@@ -61,6 +72,28 @@ function App() {
           <option value="medium">Средний</option>
           <option value="high">Высокий</option>
         </select>
+        <div style={{ display: 'flex', gap: '0.5rem', width: '80%' }}>
+          <input
+            type="number"
+            value={coordinates.x}
+            onChange={(e) => setCoordinates(prev => ({ ...prev, x: e.target.value }))}
+            placeholder='X координата'
+            style={{ padding: '0.5rem', flex: 1 }}
+          />
+          <input
+            type="number"
+            value={coordinates.y}
+            onChange={(e) => setCoordinates(prev => ({ ...prev, y: e.target.value }))}
+            placeholder='Y координата'
+            style={{ padding: '0.5rem', flex: 1 }}
+          />
+        </div>
+        <input
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          placeholder='Адрес (опционально)'
+          style={{ padding: '0.5rem', width: '80%' }}
+        />
         <button type='submit' className='button'>Добавить</button>
       </form>
       <ul>
@@ -72,8 +105,8 @@ function App() {
             animate={{opacity:1, y:0}}
             exit={{opacity:0, x:100}}
             transition={{duration:0.3}}>
-              <span>
-              {t.title} приоритет: {t.priority}
+               <span>
+                {t.title} | приоритет: {t.priority} {t.x && t.y ? `| координаты: (${t.x}, ${t.y})` : ''} {t.addres ? `| адрес: ${t.addres}` : ''}
               </span>
               <div className='task-buttons'>
                 <button onClick={()=>deletetask(t.ID)} className='button' type='submit'>Удалить</button>
@@ -88,6 +121,7 @@ function App() {
         </AnimatePresence>
       </ul>
     </div>
+    <MapComponent tasks={tasks}></MapComponent>
     </div>
   );
 }

@@ -1,20 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { createUserAndAuth, logout } from "../api/apiUser";
+import { createUserAndAuth, logout, checkAuthStatus } from "../api/apiUser";
 import "../styles/AuthForm.css";
 
-// Константы для улучшения читаемости
 const FORM_MODES = {
   REGISTER: "register",
   LOGIN: "login",
 };
 
 function AuthForm() {
-  // Состояния
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formMode, setFormMode] = useState(FORM_MODES.REGISTER);
   const [user, setUser] = useState(null);
-  
-  // Данные формы
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     username: "",
@@ -23,25 +20,38 @@ function AuthForm() {
 
   const menuRef = useRef(null);
 
-  // Обработчик клика вне формы
+  // Проверяем статус аутентификации при монтировании компонента
+  useEffect(() => {
+    const verifyAuthStatus = async () => {
+      try {
+        const authStatus = await checkAuthStatus();
+        setUser(authStatus);
+      } catch (error) {
+        console.error("Failed to verify auth status:", error);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    verifyAuthStatus();
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       const isClickOutside = menuRef.current && 
                            !menuRef.current.contains(event.target);
-      
       if (isClickOutside) {
         setIsFormOpen(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  // Обработчики изменений формы
   const handleInputChange = (field) => (event) => {
     setFormData(prevData => ({
       ...prevData,
@@ -49,13 +59,11 @@ function AuthForm() {
     }));
   };
 
-  // Открытие формы
   const openForm = (mode) => {
     setFormMode(mode);
     setIsFormOpen(true);
   };
 
-  // Сброс формы
   const resetForm = () => {
     setFormData({
       email: "",
@@ -64,7 +72,6 @@ function AuthForm() {
     });
   };
 
-  // Отправка формы
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -75,36 +82,42 @@ function AuthForm() {
     };
 
     try {
-      await createUserAndAuth(payload, formMode);
-      
+      const authResult = await createUserAndAuth(payload, formMode);
+      setUser(authResult);
       setIsFormOpen(false);
-      setUser(payload);
       resetForm();
+      console.log("User authenticated successfully");
       
-      console.log("User created successfully");
+       window.location.reload(); 
     } catch (error) {
       console.error("Authentication error:", error);
     }
   };
 
-  // Выход из системы
   const handleLogout = async () => {
     const isLoggedOut = await logout();
-    
     if (isLoggedOut) {
       setUser(null);
     }
-    
     setIsFormOpen(false);
+    
+    window.location.reload();
   };
 
-  // Вспомогательные переменные для рендеринга
   const isRegisterMode = formMode === FORM_MODES.REGISTER;
   const submitButtonText = isRegisterMode ? "Зарегистрироваться" : "Войти";
 
+  // Показываем загрузку во время проверки статуса аутентификации
+  if (isLoading) {
+    return (
+      <div className="auth-container">
+        <div className="loading">Проверка статуса...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="auth-container">
-      {/* Кнопки авторизации */}
       {!user ? (
         <div className="auth-buttons-container">
           <button
@@ -126,12 +139,10 @@ function AuthForm() {
         </button>
       )}
 
-      {/* Модальное окно формы */}
       {isFormOpen && (
         <div className="auth-form-overlay">
           <div className="auth-form" ref={menuRef}>
             <form className="auth-form-card" onSubmit={handleSubmit}>
-              {/* Поле email только для регистрации */}
               {isRegisterMode && (
                 <input
                   type="email"
@@ -142,7 +153,6 @@ function AuthForm() {
                 />
               )}
 
-              {/* Общие поля формы */}
               <input
                 type="text"
                 value={formData.username}

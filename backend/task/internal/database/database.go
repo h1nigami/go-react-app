@@ -70,7 +70,7 @@ func (d *DB) GetTaskByid(id int) (models.Task, error) {
 }
 
 func (d *DB) CreateTask(task *models.Task, user_id int) {
-	task.UserID = uint(user_id)
+	task.UserID = user_id
 	d.pool.Create(&task)
 }
 
@@ -79,6 +79,7 @@ func (d *DB) DeleteTask(id int) models.Task {
 	if err != nil {
 		log.Fatal(err)
 	}
+	task.Is_Done = true
 	d.pool.Delete(&task)
 	return task
 }

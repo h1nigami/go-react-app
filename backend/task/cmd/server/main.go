@@ -11,6 +11,7 @@ import (
 	"github.com/h1nigami/go-react-app/backend/task/internal/config"
 	"github.com/h1nigami/go-react-app/backend/task/internal/database"
 	"github.com/h1nigami/go-react-app/backend/task/internal/handlers"
+	"github.com/h1nigami/go-react-app/backend/task/internal/midleware"
 )
 
 func main() {
@@ -44,7 +45,7 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
-	}))
+	}), midleware.AuthMiddleware())
 	r.GET("/task", handlers.AllTask)
 	r.GET("/task/:id", handlers.GetTaskById)
 	r.POST("/task", handlers.CreateTask)
