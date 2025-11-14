@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import '../styles/EditDropdown.css';
+import "../styles/EditDropdown.css";
 import { updateTask } from "../api/apiTask";
 
-function EditTitleMenu({task, open, setOpen, onEdit}){
+function EditTitleMenu({ task, open, setOpen, onEdit }) {
   const menuRef = useRef();
-  const [newTask, setNewTask] = useState(task.Title)
+  const [newTask, setNewTask] = useState(task.Title);
 
   // Закрытие меню при клике вне него
   useEffect(() => {
@@ -13,30 +13,29 @@ function EditTitleMenu({task, open, setOpen, onEdit}){
         setOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [setOpen]);
 
   const handleUpdate = async () => {
     try {
-      await updateTask(task.ID, {'title':newTask})
-      setOpen(false)
-      onEdit(task)
-      setNewTask('')
-    } catch (error){
-      console.error('failed to update task ', error)
-      setOpen(false)
-      onEdit(task)
-      setNewTask('')
-    };
-    
-  }
+      await updateTask(task.ID, { title: newTask });
+      setOpen(false);
+      onEdit(task);
+      setNewTask("");
+    } catch (error) {
+      console.error("failed to update task ", error);
+      setOpen(false);
+      onEdit(task);
+      setNewTask("");
+    }
+  };
 
   return (
     open && (
       <div className="dropdown-container" ref={menuRef}>
-        <div className="dropdown-menu" >
-          <input value={newTask} onChange={(e)=>setNewTask(e.target.value)} />
+        <div className="dropdown-menu">
+          <input value={newTask} onChange={(e) => setNewTask(e.target.value)} />
           <button onClick={handleUpdate}>Изменить</button>
         </div>
       </div>
@@ -46,7 +45,7 @@ function EditTitleMenu({task, open, setOpen, onEdit}){
 
 export default function EditDropdown({ onEdit, onDelete, task }) {
   const [open, setOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false);
   const menuRef = useRef();
 
   // Закрытие меню при клике вне него
@@ -54,11 +53,11 @@ export default function EditDropdown({ onEdit, onDelete, task }) {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setOpen(false);
-        setEditOpen(false)
+        setEditOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -68,9 +67,16 @@ export default function EditDropdown({ onEdit, onDelete, task }) {
       </button>
       {open && (
         <div className="dropdown-menu">
-          <button onClick={() => setEditOpen(!editOpen)}>Изменить задачу</button>       
-          <EditTitleMenu onEdit={()=> onEdit(task)} task={task} open={editOpen} setOpen={setEditOpen}/>
-          <button onClick={()=> onEdit(task)}>Изменить приоритет</button>
+          <button onClick={() => setEditOpen(!editOpen)}>
+            Изменить задачу
+          </button>
+          <EditTitleMenu
+            onEdit={() => onEdit(task)}
+            task={task}
+            open={editOpen}
+            setOpen={setEditOpen}
+          />
+          <button onClick={() => onEdit(task)}>Изменить приоритет</button>
           <button onClick={() => onDelete(task.ID)}>Удалить</button>
         </div>
       )}

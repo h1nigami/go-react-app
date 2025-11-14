@@ -7,7 +7,9 @@
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
   font-size: 14px;
 }
 
@@ -68,7 +70,9 @@
   border: 2px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   outline: none;
   width: 100%;
   box-sizing: border-box;
@@ -119,7 +123,7 @@
     padding: 1.5rem;
     margin: 1rem;
   }
-  
+
   .auth-form-overlay {
     padding: 1rem;
     align-items: flex-start;

@@ -39,8 +39,8 @@ function AuthForm() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const isClickOutside = menuRef.current && 
-                           !menuRef.current.contains(event.target);
+      const isClickOutside =
+        menuRef.current && !menuRef.current.contains(event.target);
       if (isClickOutside) {
         setIsFormOpen(false);
       }
@@ -53,9 +53,9 @@ function AuthForm() {
   }, []);
 
   const handleInputChange = (field) => (event) => {
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      [field]: event.target.value
+      [field]: event.target.value,
     }));
   };
 
@@ -87,8 +87,8 @@ function AuthForm() {
       setIsFormOpen(false);
       resetForm();
       console.log("User authenticated successfully");
-      
-       window.location.reload(); 
+
+      window.location.reload();
     } catch (error) {
       console.error("Authentication error:", error);
     }
@@ -100,7 +100,7 @@ function AuthForm() {
       setUser(null);
     }
     setIsFormOpen(false);
-    
+
     window.location.reload();
   };
 
@@ -126,10 +126,7 @@ function AuthForm() {
           >
             Регистрация
           </button>
-          <button
-            className="button"
-            onClick={() => openForm(FORM_MODES.LOGIN)}
-          >
+          <button className="button" onClick={() => openForm(FORM_MODES.LOGIN)}>
             Войти
           </button>
         </div>
@@ -160,7 +157,7 @@ function AuthForm() {
                 placeholder="Логин"
                 required
               />
-              
+
               <input
                 type="password"
                 value={formData.password}
