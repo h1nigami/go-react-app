@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react';
 
-const MapComponent = ({ tasks = [] }) => {
+const MapComponent = ({ tasks = [], onTaskUpdate }) => {
   const mapContainer = useRef(null);
   const mapInstance = useRef(null);
   const currentMarkers = useRef([]);
+  const originalCoords = useRef(new Map());
 
   const getMarkerIcon = (priority) => {
     const icons = {
@@ -23,6 +24,22 @@ const MapComponent = ({ tasks = [] }) => {
     return colors[priority] || '#1e90ff';
   };
 
+  const handleSave = (task, newCoords) => {
+    const updatedTask = { ...task, x: newCoords[0], y: newCoords[1] };
+    onTaskUpdate(task.ID, updatedTask);
+    
+    originalCoords.current.delete(task.ID);
+  };
+
+  const handleCancel = (task, marker) => {
+    const original = originalCoords.current.get(task.ID);
+    if (original) {
+      marker.geometry.setCoordinates(original);
+      marker.options.set('iconColor', getMarkerColor(task.priority));
+      originalCoords.current.delete(task.ID);
+    }
+  };
+
   const refreshMarkers = () => {
     if (!mapInstance.current || !window.ymaps) return;
 
@@ -39,13 +56,33 @@ const MapComponent = ({ tasks = [] }) => {
       const marker = new window.ymaps.Placemark(
         [task.x, task.y],
         {
-          balloonContentHeader: task.title,
+          balloonContentHeader: "",
           balloonContentBody: `
             <div style="padding: 8px;">
               <p><strong>Приоритет:</strong> ${task.priority || 'Не указан'}</p>
               <p><strong>Адрес:</strong> ${task.addres || 'Не указан'}</p>
               <p><strong>Статус:</strong> ${task.Is_Done ? 'Выполнено' : 'В процессе'}</p>
               ${task.description ? `<p><strong>Описание:</strong> ${task.description}</p>` : ''}
+              <div style="margin-top: 10px; display: flex; gap: 8px;">
+                <button id="save-btn-${task.ID}" style="
+                  padding: 6px 12px; 
+                  background-color: #4CAF50; 
+                  color: white; 
+                  border: none; 
+                  border-radius: 4px; 
+                  cursor: pointer;
+                  font-size: 12px;
+                ">Сохранить</button>
+                <button id="cancel-btn-${task.ID}" style="
+                  padding: 6px 12px; 
+                  background-color: #f44336; 
+                  color: white; 
+                  border: none; 
+                  border-radius: 4px; 
+                  cursor: pointer;
+                  font-size: 12px;
+                ">Отменить</button>
+              </div>
             </div>
           `,
           balloonContentFooter: '',
@@ -53,9 +90,56 @@ const MapComponent = ({ tasks = [] }) => {
         },
         {
           preset: getMarkerIcon(task.priority),
-          iconColor: getMarkerColor(task.priority)
+          iconColor: getMarkerColor(task.priority),
+          draggable: true 
         }
       );
+
+      marker.events.add('dragstart', function () {
+        originalCoords.current.set(task.ID, marker.geometry.getCoordinates());
+        marker.options.set('preset', 'islands#blueIcon');
+        marker.options.set('iconColor', '#1e90ff');
+      });
+
+      marker.events.add('dragend', function (e) {
+        const newCoords = e.get('target').geometry.getCoordinates();
+        
+        marker.options.set('iconColor', getMarkerColor(task.priority));
+        
+        marker.balloon.open();
+        
+        setTimeout(() => {
+          const saveBtn = document.querySelector(`#save-btn-${task.ID}`);
+          const cancelBtn = document.querySelector(`#cancel-btn-${task.ID}`);
+          
+          if (saveBtn) {
+            saveBtn.replaceWith(saveBtn.cloneNode(true));
+            const newSaveBtn = document.querySelector(`#save-btn-${task.ID}`);
+            newSaveBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSave(task, newCoords);
+              marker.balloon.close();
+            });
+          }
+          
+          if (cancelBtn) {
+            cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+            const newCancelBtn = document.querySelector(`#cancel-btn-${task.ID}`);
+            newCancelBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleCancel(task, marker);
+              marker.balloon.close();
+            });
+          }
+        }, 100);
+      });
+        
+      marker.events.add('drag', function (e) {
+        const coords = e.get('target').geometry.getCoordinates();
+        console.log('Перетаскивание на:', coords);
+      });
 
       mapInstance.current.geoObjects.add(marker);
       currentMarkers.current.push(marker);
@@ -93,6 +177,7 @@ const MapComponent = ({ tasks = [] }) => {
           zoom: 10,
           controls: ['zoomControl', 'typeSelector', 'fullscreenControl']
         });
+
       }
       
       refreshMarkers();
@@ -106,15 +191,15 @@ const MapComponent = ({ tasks = [] }) => {
         mapInstance.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    
+  }, []); // eslint-disable-line
 
   useEffect(() => {
     if (mapInstance.current && window.ymaps) {
       refreshMarkers();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tasks]);
+    
+  }, [tasks]); // eslint-disable-line
 
   const activeTasksCount = tasks.filter(task => task.x && task.y && !task.Is_Done).length;
 

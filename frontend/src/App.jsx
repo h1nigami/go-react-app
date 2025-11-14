@@ -1,6 +1,6 @@
 import './styles/App.css';
 import { useEffect, useState } from 'react';
-import { createTask, deleteTask, getTask } from './api/apiTask';
+import { createTask, deleteTask, getTask,  updateTask } from './api/apiTask';
 import {motion, AnimatePresence} from 'framer-motion';
 import EditDropdown from './components/editDropDown';
 import AuthForm from './components/authForm';
@@ -115,13 +115,13 @@ function App() {
                       onEdit={fetchTasks}
                       onDelete={(task) => deletetask(task)}
                     />
-                    </div>
-              </motion.li>
+                    </div> 
+              </motion.li>              
           ))}
         </AnimatePresence>
       </ul>
     </div>
-    <MapComponent tasks={tasks}></MapComponent>
+    <MapComponent tasks={tasks} onTaskUpdate={updateTask}></MapComponent>
     </div>
   );
 }
