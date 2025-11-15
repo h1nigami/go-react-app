@@ -73,10 +73,11 @@ func CreateSources(c *gin.Context) {
 	} else {
 		ok := pkg.PhoneNumberValidator(Sources.Phone_Number)
 		if !ok {
+			slog.Error("validation error", slog.String("phone", Sources.Phone_Number))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid phone number"})
 		}
 		if err := validate.Struct(Sources); err != nil {
-			log.Info("validation error", slog.String("error", err.Error()))
+			log.Error("validation error", slog.String("error", err.Error()))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 			return
 		}

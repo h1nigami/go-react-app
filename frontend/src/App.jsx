@@ -133,7 +133,7 @@ function App() {
               let formated = "";
               if (value.length > 0) formated = "+7";
               if (value.length > 1) formated += ` (${value.slice(1,4)})`
-              if (value.length > 4) formated += ` ) ${value.slice(4,7)}`
+              if (value.length > 4) formated += ` ${value.slice(4,7)}`
               if (value.length > 7) formated += `-${value.slice(7,9)}`
               if (value.length > 9) formated += `-${value.slice(9,11)}`
               setPhoneNumber(formated)}} 

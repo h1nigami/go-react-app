@@ -6,8 +6,8 @@ import (
 
 type Sources struct {
 	gorm.Model
-	Email        string  `json:"email" validate:"required,email"`     //добавить валидацию
-	Phone_Number string  `json:"phonenumber validate:"required",e164` //добавить валидацию
+	Email        string  `json:"email" validate:"required,email"`      //добавить валидацию
+	Phone_Number string  `json:"phonenumber" validate:"required",e164` //добавить валидацию
 	Title        string  `json:"title"`
 	X            float32 `json:"x"`
 	Y            float32 `json:"y"`
