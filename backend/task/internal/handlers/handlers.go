@@ -10,6 +10,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/h1nigami/go-react-app/backend/task/internal/database"
 	"github.com/h1nigami/go-react-app/backend/task/internal/models"
+	"github.com/h1nigami/go-react-app/backend/task/pkg"
 )
 
 var storage database.SourcesStorage
@@ -70,6 +71,10 @@ func CreateSources(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	} else {
+		ok := pkg.PhoneNumberValidator(Sources.Phone_Number)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid phone number"})
+		}
 		if err := validate.Struct(Sources); err != nil {
 			log.Info("validation error", slog.String("error", err.Error()))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
