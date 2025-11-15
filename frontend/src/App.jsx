@@ -12,6 +12,8 @@ function App() {
   const [priority, setPriority] = useState("");
   const [coordinates, setCoordinates] = useState({ x: "", y: "" });
   const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("")
 
   useEffect(() => {
     getTask()
@@ -21,6 +23,7 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try{
     if (!newTask.trim()) return;
     const created = await createTask({
       title: newTask,
@@ -28,12 +31,24 @@ function App() {
       x: coordinates.x ? parseFloat(coordinates.x) : null,
       y: coordinates.y ? parseFloat(coordinates.y) : null,
       addres: address,
-    });
-    setTasks((prev) => [...prev, created]);
+      email: email,
+      phoneNumber: phoneNumber,
+    })
+    setTasks((prev) => [...prev, created]);;
+    
+    } 
+    catch (error) {
+      console.log(error)
+    }
+    finally{
     setNewTask("");
     setPriority("");
     setCoordinates({ x: "", y: "" });
     setAddress("");
+    setEmail("");
+    setPhoneNumber("");
+    }
+    
   };
 
   const deletetask = async (id) => {
@@ -106,8 +121,23 @@ function App() {
             placeholder="Адрес (опционально)"
             style={{ padding: "0.5rem", width: "80%" }}
           />
-          <input  value={null} onChange={null} placeholder="Email"/>
-          <input value={null} onChange={null} placeholder="Телефон"/>
+          <input
+            type="email"  
+            value={email} 
+            onChange={(e)=>setEmail(e.target.value)} 
+            placeholder="Email"/>
+          <input 
+            value={phoneNumber} 
+            onChange={(e)=>{
+              let value = e.target.value.replace(/\D/g, "")
+              let formated = "";
+              if (value.length > 0) formated = "+7";
+              if (value.length > 1) formated += ` (${value.slice(1,4)})`
+              if (value.length > 4) formated += ` ) ${value.slice(4,7)}`
+              if (value.length > 7) formated += `-${value.slice(7,9)}`
+              if (value.length > 9) formated += `-${value.slice(9,11)}`
+              setPhoneNumber(formated)}} 
+            placeholder="+7 (999) 123-45-67"/>
           <button type="submit" className="button">
             Добавить
           </button>

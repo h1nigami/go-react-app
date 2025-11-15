@@ -2,50 +2,60 @@ package handlers
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/h1nigami/go-react-app/backend/task/internal/database"
 	"github.com/h1nigami/go-react-app/backend/task/internal/models"
 )
 
-var storage database.TaskStorage
+var storage database.SourcesStorage
 
-func SetStorage(s database.TaskStorage) {
+func SetStorage(s database.SourcesStorage) {
 	storage = s
 }
 
-func AllTask(c *gin.Context) {
+var log *slog.Logger
+
+func SetLogger(l *slog.Logger) {
+	log = l
+}
+
+var validate = validator.New(validator.WithRequiredStructEnabled())
+
+func AllSources(c *gin.Context) {
 	uid, err := c.Cookie("user_id")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
-	tasks, err := storage.GetTasks(uid)
+	Sourcess, err := storage.GetSourcess(uid)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err})
 		return
 	}
-	c.JSON(http.StatusOK, tasks)
+	c.JSON(http.StatusOK, Sourcess)
 	fmt.Printf("Айди клиента %v\n", uid)
 }
 
-func GetTaskById(c *gin.Context) {
+func GetSourcesById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
-	task, e := storage.GetTaskByid(id)
+	Sources, e := storage.GetSourcesByid(id)
 	if e != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": e})
 	}
-	c.JSON(http.StatusOK, task)
+	c.JSON(http.StatusOK, Sources)
 }
 
-func CreateTask(c *gin.Context) {
-	var task models.Task
+func CreateSources(c *gin.Context) {
+	var Sources models.Sources
 	uidStr, err := c.Cookie("user_id")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "user id cookie not found"})
@@ -56,37 +66,43 @@ func CreateTask(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
 		return
 	}
-	if err := c.BindJSON(&task); err != nil {
+	if err := c.BindJSON(&Sources); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
+		return
 	} else {
-		storage.CreateTask(&task, uid)
-		c.JSON(http.StatusCreated, task)
+		if err := validate.Struct(Sources); err != nil {
+			log.Info("validation error", slog.String("error", err.Error()))
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+			return
+		}
+		storage.CreateSources(&Sources, uid)
+		c.JSON(http.StatusCreated, Sources)
 	}
 }
 
-func DeleteTask(c *gin.Context) {
+func DeleteSources(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
-	task := storage.DeleteTask(id)
-	c.JSON(http.StatusOK, gin.H{"deleted": task})
+	Sources := storage.DeleteSources(id)
+	c.JSON(http.StatusOK, gin.H{"deleted": Sources})
 }
 
-func Updatetask(c *gin.Context) {
-	var task models.Task
+func UpdateSources(c *gin.Context) {
+	var Sources models.Sources
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
-	if err := c.BindJSON(&task); err != nil {
+	if err := c.BindJSON(&Sources); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	} else {
-		storage.UpdateTask(id, task)
-		c.JSON(http.StatusOK, task)
+		storage.UpdateSources(id, Sources)
+		c.JSON(http.StatusOK, Sources)
 	}
 
 }

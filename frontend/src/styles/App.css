@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: #f3f4f6;
+  background: rgb(3, 3, 21);
   font-family: "Inter", sans-serif;
   display: flex;
   justify-content: center;
@@ -11,7 +11,7 @@ body {
 
 /* Карточка */
 .todo-card {
-  background: white;
+  background: whitesmoke;
   margin-top: 5rem;
   width: 100%;
   max-width: 500px;
@@ -152,6 +152,10 @@ li .task-buttons {
   text-align: center;
   transition: transform 0.3s ease;
   overflow: auto;
+}
+
+.map-contaiter:hover{
+  transform: translateY(-3px);
 }
 
 /*.map-contaiter > div{

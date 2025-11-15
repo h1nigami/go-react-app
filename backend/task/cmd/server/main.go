@@ -16,7 +16,8 @@ import (
 func main() {
 	cfg := config.MustLoad()
 	log := setUpLogger(cfg.Env)
-	var storage database.TaskStorage
+	handlers.SetLogger(log)
+	var storage database.SourcesStorage
 
 	switch cfg.StorageType {
 	case "sqlite":
@@ -45,11 +46,11 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-	r.GET("/task", handlers.AllTask)
-	r.GET("/task/:id", handlers.GetTaskById)
-	r.POST("/task", handlers.CreateTask)
-	r.DELETE("/task/:id", handlers.DeleteTask)
-	r.PATCH("task/:id", handlers.Updatetask)
+	r.GET("/task", handlers.AllSources)
+	r.GET("/task/:id", handlers.GetSourcesById)
+	r.POST("/task", handlers.CreateSources)
+	r.DELETE("/task/:id", handlers.DeleteSources)
+	r.PATCH("task/:id", handlers.UpdateSources)
 	srv := &http.Server{
 		Addr:         cfg.Addres,
 		Handler:      r,

@@ -11,19 +11,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type TaskStorage interface {
-	CreateTask(task *models.Task, user_id int)
-	GetTasks(user_id any) ([]models.Task, error)
-	GetTaskByid(id int) (models.Task, error)
-	DeleteTask(id int) models.Task
-	UpdateTask(id int, task models.Task) error
-	UpdateTaskPriority(id int, task models.Task) error
+type SourcesStorage interface {
+	CreateSources(Sources *models.Sources, user_id int)
+	GetSourcess(user_id any) ([]models.Sources, error)
+	GetSourcesByid(id int) (models.Sources, error)
+	DeleteSources(id int) models.Sources
+	UpdateSources(id int, Sources models.Sources) error
+	UpdateSourcesPriority(id int, Sources models.Sources) error
 }
 
-func (d *DB) UpdateTaskPriority(id int, task models.Task) error {
-	const op = "database.UpdateTaskPriority"
+func (d *DB) UpdateSourcesPriority(id int, Sources models.Sources) error {
+	const op = "database.UpdateSourcesPriority"
 	err := fmt.Sprintf("no rows detected on %s", op)
-	result := d.pool.Model(&models.Task{}).Where("ID = ?", id).Updates(task)
+	result := d.pool.Model(&models.Sources{}).Where("ID = ?", id).Updates(Sources)
 
 	if result.Error != nil {
 		return result.Error
@@ -54,55 +54,55 @@ func NewSqliteConnection(db_name string) (*DB, error) {
 }
 
 func (d *DB) createTables() {
-	d.pool.AutoMigrate(&models.Task{})
+	d.pool.AutoMigrate(&models.Sources{})
 }
 
-func (d *DB) GetTasks(user_id any) ([]models.Task, error) {
-	var tasks []models.Task
-	result := d.pool.Where("user_id = ?", user_id).Find(&tasks)
-	return tasks, result.Error
+func (d *DB) GetSourcess(user_id any) ([]models.Sources, error) {
+	var Sourcess []models.Sources
+	result := d.pool.Where("user_id = ?", user_id).Find(&Sourcess)
+	return Sourcess, result.Error
 }
 
-func (d *DB) GetTaskByid(id int) (models.Task, error) {
-	var task models.Task
-	result := d.pool.Where("ID = ?", id).Find(&task)
-	return task, result.Error
+func (d *DB) GetSourcesByid(id int) (models.Sources, error) {
+	var Sources models.Sources
+	result := d.pool.Where("ID = ?", id).Find(&Sources)
+	return Sources, result.Error
 }
 
-func (d *DB) CreateTask(task *models.Task, user_id int) {
-	task.UserID = user_id
-	d.pool.Create(&task)
+func (d *DB) CreateSources(Sources *models.Sources, user_id int) {
+	Sources.UserID = user_id
+	d.pool.Create(&Sources)
 }
 
-func (d *DB) DeleteTask(id int) models.Task {
-	task, err := d.GetTaskByid(id)
+func (d *DB) DeleteSources(id int) models.Sources {
+	Sources, err := d.GetSourcesByid(id)
 	if err != nil {
 		log.Fatal(err)
 	}
-	task.Is_Done = true
-	d.pool.Delete(&task)
-	return task
+	Sources.Is_Done = true
+	d.pool.Delete(&Sources)
+	return Sources
 }
 
-func (d *DB) UpdateTask(id int, task models.Task) error {
-	result := d.pool.Model(&models.Task{}).Where("ID = ?", id).Updates(task)
+func (d *DB) UpdateSources(id int, Sources models.Sources) error {
+	result := d.pool.Model(&models.Sources{}).Where("ID = ?", id).Updates(Sources)
 
 	if result.Error != nil {
 		return result.Error
 	}
 
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("task with ID %d not found", id)
+		return fmt.Errorf("Sources with ID %d not found", id)
 	}
 
 	return nil
 }
 
 var cfg *config.Config = config.MustLoad()
-var DataBase TaskStorage
+var DataBase SourcesStorage
 
 func InitSqliteDatabase() error {
-	const op = "InitDatabase in task service"
+	const op = "InitDatabase in Sources service"
 	db, err := NewSqliteConnection(cfg.StoragePath)
 	if err != nil {
 		return fmt.Errorf("%v : %v", op, err)
