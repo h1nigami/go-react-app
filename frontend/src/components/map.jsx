@@ -218,7 +218,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
           color: "#333",
         }}
       >
-        Карта задач ({activeTasksCount})
+        Карта источников ({activeTasksCount})
       </h2>
 
       <div

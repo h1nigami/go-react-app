@@ -121,12 +121,13 @@ func LoginHandler(c *gin.Context) {
 		"exp":     time.Now().Add(1 * time.Hour).Unix(),
 		"user_id": user.ID,
 	})
+
 	tokenstr, err := token.SignedString([]byte(cfg.Secret_key))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "failed to create token"})
 		return
 	}
-
+	//log.Info("token", slog.String("token", tokenstr))
 	c.SetCookie("token", tokenstr, 3600, "/", "localhost", true, false)
 	c.SetCookie("user_id", fmt.Sprintf("%d", user.ID), 3600, "/", "localhost", true, false)
 	c.JSON(http.StatusOK, gin.H{"message": "login successful", "token": tokenstr})

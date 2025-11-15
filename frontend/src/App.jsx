@@ -48,9 +48,13 @@ function App() {
 
   return (
     <div>
-      <AuthForm />
+      <div>
+        <AuthForm />
+      </div>
+      
+      <div className="layot">
       <div className="todo-card">
-        <h1>Tasks</h1>
+        <h1>Создать источник</h1>
         <form
           onSubmit={handleSubmit}
           style={{
@@ -63,7 +67,7 @@ function App() {
           <input
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
-            placeholder="Новая задача"
+            placeholder="Наименование"
             style={{ padding: "0.5rem", width: "80%" }}
           />
           <select
@@ -83,7 +87,7 @@ function App() {
               onChange={(e) =>
                 setCoordinates((prev) => ({ ...prev, x: e.target.value }))
               }
-              placeholder="X координата"
+              placeholder="Широта"
               style={{ padding: "0.5rem", flex: 1 }}
             />
             <input
@@ -92,7 +96,7 @@ function App() {
               onChange={(e) =>
                 setCoordinates((prev) => ({ ...prev, y: e.target.value }))
               }
-              placeholder="Y координата"
+              placeholder="Долгота"
               style={{ padding: "0.5rem", flex: 1 }}
             />
           </div>
@@ -102,6 +106,8 @@ function App() {
             placeholder="Адрес (опционально)"
             style={{ padding: "0.5rem", width: "80%" }}
           />
+          <input  value={null} onChange={null} placeholder="Email"/>
+          <input value={null} onChange={null} placeholder="Телефон"/>
           <button type="submit" className="button">
             Добавить
           </button>
@@ -141,7 +147,11 @@ function App() {
           </AnimatePresence>
         </ul>
       </div>
-      <MapComponent tasks={tasks} onTaskUpdate={updateTask}></MapComponent>
+      <div className="map-contaiter">
+<MapComponent tasks={tasks} onTaskUpdate={updateTask}></MapComponent>
+      </div>
+      
+      </div>
     </div>
   );
 }
