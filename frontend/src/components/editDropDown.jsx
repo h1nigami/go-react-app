@@ -68,7 +68,7 @@ export default function EditDropdown({ onEdit, onDelete, task }) {
       {open && (
         <div className="dropdown-menu">
           <button onClick={() => setEditOpen(!editOpen)}>
-            Изменить задачу
+            Изменить источник
           </button>
           <EditTitleMenu
             onEdit={() => onEdit(task)}

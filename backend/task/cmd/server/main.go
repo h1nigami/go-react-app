@@ -17,6 +17,7 @@ func main() {
 	cfg := config.MustLoad()
 	log := setUpLogger(cfg.Env)
 	handlers.SetLogger(log)
+	database.SetLoger(log)
 	var storage database.SourcesStorage
 
 	switch cfg.StorageType {

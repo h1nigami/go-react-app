@@ -3,13 +3,19 @@ package database
 import (
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 
 	"github.com/glebarez/sqlite"
 	"github.com/h1nigami/go-react-app/backend/task/internal/config"
 	"github.com/h1nigami/go-react-app/backend/task/internal/models"
 	"gorm.io/gorm"
 )
+
+var log *slog.Logger
+
+func SetLoger(l *slog.Logger) {
+	log = l
+}
 
 type SourcesStorage interface {
 	CreateSources(Sources *models.Sources, user_id int)
@@ -47,7 +53,6 @@ func NewSqliteConnection(db_name string) (*DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ошибка в функции %v: %v", op, err)
 	}
-	log.Println("подключение к бд успешно")
 	data := DB{pool: db}
 	data.createTables()
 	return &data, nil
@@ -77,7 +82,7 @@ func (d *DB) CreateSources(Sources *models.Sources, user_id int) {
 func (d *DB) DeleteSources(id int) models.Sources {
 	Sources, err := d.GetSourcesByid(id)
 	if err != nil {
-		log.Fatal(err)
+		log.Error("database error", slog.String("DeleteSources", err.Error()))
 	}
 	Sources.Is_Done = true
 	d.pool.Delete(&Sources)

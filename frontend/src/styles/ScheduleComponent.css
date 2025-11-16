@@ -1,0 +1,100 @@
+.ws-wrapper{
+    position: relative;
+    width: 100%;
+    font-family: Inter, system-ui, sans-serif;
+}
+
+.ws-toggle{
+     width: 90%;
+  max-width: 300px;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  font-size: 1rem;
+  transition:
+    border 0.2s ease,
+    box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+.ws-toggle:focus{
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+
+.ws-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    z-index: 1200;
+    background: #fff;
+    border: 1px solid #e6e8ef;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 8px 30px rgba(18, 25, 40, 0.06);
+}
+
+.ws-days{
+    position: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ws-day-item{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: #f5f6fb;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ws-day-item.selected{
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+}
+
+.ws-day-item input {
+    width: 14px;
+    height: 14px;
+}
+
+.ws-time{
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.ws-time-item{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+}
+
+.ws-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.ws-clear{
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #e6e8ef;
+    background: #fff;
+    cursor: pointer;
+}
+
+.ws-save{
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+    background: green;
+    color: white;
+    cursor: pointer;
+}

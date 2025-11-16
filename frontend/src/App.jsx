@@ -5,15 +5,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import EditDropdown from "./components/editDropDown";
 import AuthForm from "./components/authForm";
 import MapComponent from "./components/map";
+import WorkScheduleSelect from "./components/scheduleComponent";
+
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
-  const [priority, setPriority] = useState("");
+  const [schedule, setSchedule] = useState(null)
   const [coordinates, setCoordinates] = useState({ x: "", y: "" });
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("")
+
+  
 
   useEffect(() => {
     getTask()
@@ -27,7 +31,7 @@ function App() {
     if (!newTask.trim()) return;
     const created = await createTask({
       title: newTask,
-      priority: priority,
+      schedule: schedule,
       x: coordinates.x ? parseFloat(coordinates.x) : null,
       y: coordinates.y ? parseFloat(coordinates.y) : null,
       addres: address,
@@ -42,7 +46,7 @@ function App() {
     }
     finally{
     setNewTask("");
-    setPriority("");
+    setSchedule(null);
     setCoordinates({ x: "", y: "" });
     setAddress("");
     setEmail("");
@@ -85,16 +89,7 @@ function App() {
             placeholder="Наименование"
             style={{ padding: "0.5rem", width: "80%" }}
           />
-          <select
-            value={priority}
-            onChange={(e) => setPriority(e.target.value)}
-            style={{ padding: "0.5rem", width: "80%" }}
-          >
-            <option value="">Выберите приоритет</option>
-            <option value="low">Низкий</option>
-            <option value="medium">Средний</option>
-            <option value="high">Высокий</option>
-          </select>
+          <WorkScheduleSelect value={schedule} onChange={setSchedule}/>
           <div style={{ display: "flex", gap: "0.5rem", width: "80%" }}>
             <input
               type="number"
@@ -157,6 +152,8 @@ function App() {
                   {t.title} | приоритет: {t.priority}{" "}
                   {t.x && t.y ? `| координаты: (${t.x}, ${t.y})` : ""}{" "}
                   {t.addres ? `| адрес: ${t.addres}` : ""}
+                  {t.email ? `| почта: ${t.email}` : ""}
+                  {t.phoneNumber ? `| телефон: ${t.phoneNumber}` : ""}
                 </span>
                 <div className="task-buttons">
                   <button
