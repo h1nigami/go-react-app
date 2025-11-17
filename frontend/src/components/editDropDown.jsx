@@ -76,7 +76,6 @@ export default function EditDropdown({ onEdit, onDelete, task }) {
             open={editOpen}
             setOpen={setEditOpen}
           />
-          <button onClick={() => onEdit(task)}>Изменить приоритет</button>
           <button onClick={() => onDelete(task.ID)}>Удалить</button>
         </div>
       )}

@@ -27,7 +27,6 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
   const handleSave = (task, newCoords) => {
     const updatedTask = { ...task, x: newCoords[0], y: newCoords[1] };
     onTaskUpdate(task.ID, updatedTask);
-
     originalCoords.current.delete(task.ID);
   };
 
@@ -106,9 +105,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
 
       marker.events.add("dragend", function (e) {
         const newCoords = e.get("target").geometry.getCoordinates();
-
         marker.options.set("iconColor", getMarkerColor(task.priority));
-
         marker.balloon.open();
 
         setTimeout(() => {
@@ -150,15 +147,6 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
       currentMarkers.current.push(marker);
     });
 
-    if (currentMarkers.current.length > 0) {
-      mapInstance.current.setBounds(
-        mapInstance.current.geoObjects.getBounds(),
-        {
-          checkZoomRange: true,
-          zoomMargin: 30,
-        },
-      );
-    }
   };
 
   useEffect(() => {

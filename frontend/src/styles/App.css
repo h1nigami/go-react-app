@@ -65,6 +65,8 @@ select:focus {
 
 /* Кнопка */
 .button {
+  flex:1;
+  border-top: none;
   width: 9rem;
   max-width: 300px;
   padding: 0.5rem;
@@ -101,8 +103,9 @@ li {
   padding: 0.75rem 1rem;
   border-radius: 8px;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   border-left: 6px solid transparent;
   transition: background 0.2s ease;
 }
@@ -111,29 +114,7 @@ li:hover {
   background: #f3f4f6;
 }
 
-/* Цвета приоритетов */
-.priority-low {
-  border-left-color: #10b981;
-}
-
-.priority-medium {
-  border-left-color: #f59e0b;
-}
-
-.priority-high {
-  border-left-color: #ef4444;
-}
-
-li span {
-  font-weight: 500;
-  color: #374151;
-}
-
-li .task-buttons {
-  display: flex;
-  gap: 5px;
-  flex-direction: column-reverse;
-}
+/* ... остальной код ... */
 
 .layot{
   display: flex;
@@ -166,3 +147,149 @@ li .task-buttons {
   left: 0;
 }*/
 
+.contact-info {
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin: 8px 0;
+  border-top: none;
+}
+
+.contact-title {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+  padding: 4px 0;
+}
+
+.contact-icon {
+  margin-right: 8px;
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.contact-label {
+  font-weight: 500;
+  color: #555;
+  margin-right: 8px;
+  min-width: 80px;
+}
+
+.contact-value {
+  color: #333;
+}
+
+.contact-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.contact-link:hover {
+  text-decoration: underline;
+}
+
+.contact-compact {
+  padding: 12px;
+}
+
+.contact-title {
+  margin: 0 0 8px 0;
+  color: #333;
+}
+
+.contact-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.contact-grid {
+  padding: 16px;
+}
+
+.contact-title {
+  margin: 0 0 16px 0;
+}
+
+.contact-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.contact-card {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.card-icon {
+  font-size: 24px;
+  margin-right: 12px;
+  width: 30px;
+  text-align: center;
+}
+
+.card-content {
+  flex: 1;
+}
+
+.card-label {
+  font-size: 12px;
+  color: #6c757d;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.card-value, .card-link {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+.card-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.card-link:hover {
+  text-decoration: underline;
+}
+
+/* Кнопки управления задачами под карточкой */
+.task-controls {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.task-controls .button {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}

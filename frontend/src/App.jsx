@@ -6,6 +6,7 @@ import EditDropdown from "./components/editDropDown";
 import AuthForm from "./components/authForm";
 import MapComponent from "./components/map";
 import WorkScheduleSelect from "./components/scheduleComponent";
+import scheduleDays from "./scripts/schedulePrintScript"
 
 
 function App() {
@@ -143,6 +144,7 @@ function App() {
         </form>
         <ul>
           <AnimatePresence>
+
             {tasks.map((t) => (
               <motion.li
                 className={`priority-${t.priority}`}
@@ -152,13 +154,49 @@ function App() {
                 exit={{ opacity: 0, x: 100 }}
                 transition={{ duration: 0.3 }}
               >
-                <span>
-                  {t.title} | приоритет: {t.priority}{" "}
-                  {t.x && t.y ? `| координаты: (${t.x}, ${t.y})` : ""}{" "}
-                  {t.addres ? `| адрес: ${t.addres}` : ""}
-                  {t.email ? `| почта: ${t.email}` : ""}
-                  {t.phoneNumber ? `| телефон: ${t.phoneNumber}` : ""}
-                </span>
+                <div className="contact-info">
+                  <h3 className="contact-title">{t.title}</h3>
+                  
+                  {t.x && t.y && (
+                    <div className="contact-item">
+                      <span className="contact-icon">📍</span>
+                      <span className="contact-label">Координаты:</span>
+                      <span className="contact-value">({t.x}, {t.y})</span>
+                    </div>
+                  )}
+
+                  {t.addres && (
+                    <div className="contact-item">
+                      <span className="contact-icon">🏠</span>
+                      <span className="contact-label">Адрес:</span>
+                      <span className="contact-value">{t.addres}</span>
+                    </div>
+                  )}
+
+                  {t.email && (
+                    <div className="contact-item">
+                      <span className="contact-icon">✉️</span>
+                      <span className="contact-label">Почта:</span>
+                      <a href={`mailto:${t.email}`} className="contact-link">{t.email}</a>
+                    </div>
+                  )}
+
+                  {t.phonenumber && (
+                    <div className="contact-item">
+                      <span className="contact-icon">📞</span>
+                      <span className="contact-label">Телефон:</span>
+                      <a href={`tel:${t.phonenumber}`} className="contact-link">{t.phonenumber}</a>
+                    </div>
+                  )}
+
+                  {t.schedule && (
+                    <div className="contact-item">
+                      <span className="contact-icon">🕒</span>
+                      <span className="contact-label">График:</span>
+                      <span className="contact-value">{scheduleDays(t.schedule.days)} {t.schedule.start}-{t.schedule.end}</span>
+                    </div>
+                  )}
+                </div>
                 <div className="task-buttons">
                   <button
                     onClick={() => deletetask(t.ID)}
@@ -175,6 +213,8 @@ function App() {
                 </div>
               </motion.li>
             ))}
+
+
           </AnimatePresence>
         </ul>
       </div>
