@@ -103,6 +103,7 @@ function App() {
               style={{ padding: "0.5rem", width: "80%" }}
             />
             <WorkScheduleSelect value={schedule} onChange={setSchedule} />
+{/* 
             <div style={{ display: "flex", gap: "0.5rem", width: "80%" }}>
               <input
                 type="number"
@@ -123,6 +124,7 @@ function App() {
                 style={{ padding: "0.5rem", flex: 1 }}
               />
             </div>
+*/}
             <input
               value={address.country}
               onChange={(e) =>

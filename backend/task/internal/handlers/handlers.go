@@ -118,3 +118,9 @@ func Cities(c *gin.Context) {
 	c.JSON(http.StatusOK, pkg.GetAllCities())
 	return
 }
+
+func GeoCode(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"x": pkg.GeoCoder(c.Param("addres"))[0].GeoLat,
+		"y": pkg.GeoCoder(c.Param("addres"))[0].GeoLon})
+	return
+}

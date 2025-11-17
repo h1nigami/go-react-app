@@ -56,6 +56,7 @@ func main() {
 	r.DELETE("/task/:id", handlers.DeleteSources)
 	r.PATCH("/task/:id", handlers.UpdateSources)
 	r.GET("/cities", handlers.Cities)
+	r.GET("/geocode/:addres", handlers.GeoCode)
 
 	srv := &http.Server{
 		Addr:         cfg.Addres,
