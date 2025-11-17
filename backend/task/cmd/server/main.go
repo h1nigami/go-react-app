@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -18,25 +21,23 @@ func main() {
 	log := setUpLogger(cfg.Env)
 	handlers.SetLogger(log)
 	database.SetLoger(log)
+
 	var storage database.SourcesStorage
 
 	switch cfg.StorageType {
 	case "sqlite":
-		err := database.InitSqliteDatabase()
-		if err != nil {
+		if err := database.InitSqliteDatabase(); err != nil {
 			log.Error("Ошибка инициализации sqlite базы данных", slog.Any("error", err))
 		}
 		storage = database.DataBase
 		log.Info("Используется sqlite база данных")
 	case "postgresql":
-		panic("постгрес еще не реализован")
+		log.Error("постгрес еще не реализован")
 	default:
 		log.Error("не получилось задать тип базы данных")
 	}
 
 	handlers.SetStorage(storage)
-
-	log.Info("микросервис для таск стартует", slog.String("env", cfg.Env), slog.String("addr", cfg.Addres), slog.Any("storage_path", cfg.StoragePath))
 
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -51,7 +52,8 @@ func main() {
 	r.GET("/task/:id", handlers.GetSourcesById)
 	r.POST("/task", handlers.CreateSources)
 	r.DELETE("/task/:id", handlers.DeleteSources)
-	r.PATCH("task/:id", handlers.UpdateSources)
+	r.PATCH("/task/:id", handlers.UpdateSources)
+
 	srv := &http.Server{
 		Addr:         cfg.Addres,
 		Handler:      r,
@@ -60,10 +62,25 @@ func main() {
 		IdleTimeout:  cfg.IdleTimeout,
 	}
 
-	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Error("ошибка при запуске сервера", slog.Any("error", err))
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Error("ошибка при запуске сервера", slog.Any("error", err))
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Info("Вырубаем сервер")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Error("ошибка при закрытии сервера", slog.Any("error", err))
 	}
 
+	log.Info("Сервер вырублен")
 }
 
 const (

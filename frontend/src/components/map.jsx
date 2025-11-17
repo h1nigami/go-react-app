@@ -59,9 +59,12 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
           balloonContentHeader: "",
           balloonContentBody: `
             <div style="padding: 8px;">
-              <p><strong>Приоритет:</strong> ${task.priority || "Не указан"}</p>
+              <p><strong>График работы:</strong> ${task.schedule.start} - ${task.schedule.end || "Не указан"}</p>
+              <p><strong>Название:</strong> ${task.title}
               <p><strong>Адрес:</strong> ${task.addres || "Не указан"}</p>
               <p><strong>Статус:</strong> ${task.Is_Done ? "Выполнено" : "В процессе"}</p>
+              <p><strong>Номер телефона :</strong> ${task.phone || "Не указан"}</p>
+              <p><strong>Email:</strong> ${task.email || "Не указан"}</p>
               ${task.description ? `<p><strong>Описание:</strong> ${task.description}</p>` : ""}
               <div style="margin-top: 10px; display: flex; gap: 8px;">
                 <button id="save-btn-${task.ID}" style="
@@ -181,7 +184,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
 
       if (!mapInstance.current) {
         mapInstance.current = new ymaps.Map(mapContainer.current, {
-          center: [55.7522, 37.6156],
+          center: [58.01, 56.25],
           zoom: 10,
           controls: ["zoomControl", "typeSelector", "fullscreenControl"],
         });

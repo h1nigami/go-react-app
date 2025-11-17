@@ -84,7 +84,6 @@ func (d *DB) DeleteSources(id int) models.Sources {
 	if err != nil {
 		log.Error("database error", slog.String("DeleteSources", err.Error()))
 	}
-	Sources.Is_Done = true
 	d.pool.Delete(&Sources)
 	return Sources
 }

@@ -31,7 +31,11 @@ function App() {
     if (!newTask.trim()) return;
     const created = await createTask({
       title: newTask,
-      schedule: schedule,
+      schedule: {
+        days: schedule.days.join(","),
+        start: schedule.start,
+        end: schedule.end,
+      },
       x: coordinates.x ? parseFloat(coordinates.x) : null,
       y: coordinates.y ? parseFloat(coordinates.y) : null,
       addres: address,

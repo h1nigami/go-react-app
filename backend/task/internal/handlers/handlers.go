@@ -68,6 +68,7 @@ func CreateSources(c *gin.Context) {
 		return
 	}
 	if err := c.BindJSON(&Sources); err != nil {
+		log.Info("Data from frontend", slog.Any("source", Sources))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	} else {

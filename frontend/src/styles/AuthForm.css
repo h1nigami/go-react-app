@@ -11,6 +11,7 @@
     background-color 0.2s ease,
     transform 0.1s ease;
   font-size: 14px;
+  gap: 10px;
 }
 
 .button:hover {
