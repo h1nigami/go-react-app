@@ -1,6 +1,6 @@
 import "./styles/App.css";
 import { useEffect, useState } from "react";
-import { createTask, deleteTask, getTask, updateTask } from "./api/apiTask";
+import { createTask, deleteTask, geoCode, getTask, updateTask } from "./api/apiTask";
 import { motion, AnimatePresence } from "framer-motion";
 import EditDropdown from "./components/editDropDown";
 import AuthForm from "./components/authForm";
@@ -32,6 +32,9 @@ function App() {
     e.preventDefault();
     if (!newTask.trim()) return;
     try {
+      const coords = await geoCode(`${address.country} ${address.city} ${address.street} ${address.number}`);
+      console.log(coords)
+      setCoordinates({ x: coords.x, y: coords.y });
       const created = await createTask({
         title: newTask,
         schedule: {
@@ -39,8 +42,8 @@ function App() {
           start: schedule.start,
           end: schedule.end,
         },
-        x: coordinates.x ? parseFloat(coordinates.x) : null,
-        y: coordinates.y ? parseFloat(coordinates.y) : null,
+        x: coords.x ? parseFloat(coords.x) : null,
+        y: coords.y ? parseFloat(coords.y) : null,
         addres: {
           street: address.street,
           city: address.city,
@@ -77,6 +80,8 @@ function App() {
     const tasksfromserver = await getTask();
     setTasks(tasksfromserver);
   };
+
+
 
   return (
     <div>
@@ -212,7 +217,7 @@ function App() {
                         <span className="contact-icon">🏠</span>
                         <span className="contact-label">Адрес:</span>
                         <span className="contact-value">
-                          {t.addres.street}/{t.addres.number}
+                          {t.addres.city}/{t.addres.street}/{t.addres.number}
                         </span>
                       </div>
                     )}

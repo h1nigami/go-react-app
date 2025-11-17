@@ -53,3 +53,9 @@ export async function cities() {
   if (!responce.ok) throw new Error("failed to fetch cities");
   return responce.json();
 }
+
+export async function geoCode(addres){
+  const responce = await fetch(`${API_URL}/geocode/${addres}`);
+  if (!responce.ok) throw new Error("failed to fetch geoCode");
+  return responce.json();
+}
