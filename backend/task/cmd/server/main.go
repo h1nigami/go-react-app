@@ -53,6 +53,7 @@ func main() {
 	r.POST("/task", handlers.CreateSources)
 	r.DELETE("/task/:id", handlers.DeleteSources)
 	r.PATCH("/task/:id", handlers.UpdateSources)
+	r.GET("/cities", handlers.Cities)
 
 	srv := &http.Server{
 		Addr:         cfg.Addres,
@@ -61,7 +62,6 @@ func main() {
 		WriteTimeout: cfg.Timeout,
 		IdleTimeout:  cfg.IdleTimeout,
 	}
-
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Error("ошибка при запуске сервера", slog.Any("error", err))

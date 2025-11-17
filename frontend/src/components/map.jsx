@@ -6,6 +6,34 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
   const currentMarkers = useRef([]);
   const originalCoords = useRef(new Map());
 
+  // Ключ для localStorage
+  const STORAGE_KEY = 'map_tasks_data';
+
+  // Сохранение задач в localStorage
+  const saveTasksToStorage = (tasksData) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
+    } catch (error) {
+      console.warn('Не удалось сохранить задачи в localStorage:', error);
+    }
+  };
+
+  // Загрузка задач из localStorage
+  const loadTasksFromStorage = () => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.warn('Не удалось загрузить задачи из localStorage:', error);
+      return [];
+    }
+  };
+
+  // Получение всех задач (из пропсов или localStorage)
+  const getAllTasks = () => {
+    return tasks.length > 0 ? tasks : loadTasksFromStorage();
+  };
+
   const getMarkerIcon = (priority) => {
     const icons = {
       high: "islands#redIcon",
@@ -28,6 +56,11 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
     const updatedTask = { ...task, x: newCoords[0], y: newCoords[1] };
     onTaskUpdate(task.ID, updatedTask);
     originalCoords.current.delete(task.ID);
+    
+    // Сохраняем обновленные задачи в localStorage
+    const allTasks = getAllTasks();
+    const updatedTasks = allTasks.map(t => t.ID === task.ID ? updatedTask : t);
+    saveTasksToStorage(updatedTasks);
   };
 
   const handleCancel = (task, marker) => {
@@ -47,7 +80,9 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
     });
     currentMarkers.current = [];
 
-    const activeTasks = tasks.filter(
+    // Используем getAllTasks() для получения данных
+    const allTasks = getAllTasks();
+    const activeTasks = allTasks.filter(
       (task) => task.x && task.y && !task.Is_Done,
     );
 
@@ -58,11 +93,11 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
           balloonContentHeader: "",
           balloonContentBody: `
             <div style="padding: 8px;">
-              <p><strong>График работы:</strong> ${task.schedule.start} - ${task.schedule.end || "Не указан"}</p>
-              <p><strong>Название:</strong> ${task.title}
-              <p><strong>Адрес:</strong> ${task.addres || "Не указан"}</p>
+              <p><strong>График работы:</strong> ${task.schedule?.start || "Не указан"} - ${task.schedule?.end || "Не указан"}</p>
+              <p><strong>Название:</strong> ${task.title || "Без названия"}</p>
+              <p><strong>Адрес:</strong> ${task.addres?.street || "Не указан"}</p>
               <p><strong>Статус:</strong> ${task.Is_Done ? "Выполнено" : "В процессе"}</p>
-              <p><strong>Номер телефона :</strong> ${task.phone || "Не указан"}</p>
+              <p><strong>Номер телефона:</strong> ${task.phone || "Не указан"}</p>
               <p><strong>Email:</strong> ${task.email || "Не указан"}</p>
               ${task.description ? `<p><strong>Описание:</strong> ${task.description}</p>` : ""}
               <div style="margin-top: 10px; display: flex; gap: 8px;">
@@ -88,7 +123,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
             </div>
           `,
           balloonContentFooter: "",
-          hintContent: task.title,
+          hintContent: task.title || "Задача",
         },
         {
           preset: getMarkerIcon(task.priority),
@@ -146,9 +181,9 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
       mapInstance.current.geoObjects.add(marker);
       currentMarkers.current.push(marker);
     });
-
   };
 
+  // Инициализация карты и загрузка данных
   useEffect(() => {
     const loadMaps = () => {
       if (window.ymaps) {
@@ -172,7 +207,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
 
       if (!mapInstance.current) {
         mapInstance.current = new ymaps.Map(mapContainer.current, {
-          center: [58.01, 56.25],
+          center: [58.01, 56.25], //Пермь
           zoom: 10,
           controls: ["zoomControl", "typeSelector", "fullscreenControl"],
         });
@@ -190,13 +225,24 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
     };
   }, []); // eslint-disable-line
 
+  // Обновление маркеров при изменении задач и сохранение в localStorage
   useEffect(() => {
     if (mapInstance.current && window.ymaps) {
+      // Сохраняем задачи в localStorage при любом изменении
+      saveTasksToStorage(tasks);
       refreshMarkers();
     }
   }, [tasks]); // eslint-disable-line
 
-  const activeTasksCount = tasks.filter(
+  // Дополнительное обновление при монтировании компонента
+  useEffect(() => {
+    if (mapInstance.current && window.ymaps) {
+      refreshMarkers();
+    }// eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapInstance.current, window.ymaps]);
+
+  const allTasks = getAllTasks();
+  const activeTasksCount = allTasks.filter(
     (task) => task.x && task.y && !task.Is_Done,
   ).length;
 

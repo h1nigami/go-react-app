@@ -47,3 +47,9 @@ export async function updateTask(id, updatedTask) {
   if (!responce.ok) throw new Error("failed to update task");
   return responce.json();
 }
+
+export async function cities() {
+  const responce = await fetch(`${API_URL}/cities`);
+  if (!responce.ok) throw new Error("failed to fetch cities");
+  return responce.json();
+}

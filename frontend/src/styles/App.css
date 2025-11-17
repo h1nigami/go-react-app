@@ -65,7 +65,7 @@ select:focus {
 
 /* Кнопка */
 .button {
-  flex:1;
+  flex: 1;
   border-top: none;
   width: 9rem;
   max-width: 300px;
@@ -116,14 +116,14 @@ li:hover {
 
 /* ... остальной код ... */
 
-.layot{
+.layot {
   display: flex;
   flex-direction: row;
   gap: 10px;
 }
 
-.map-contaiter{
- background: white;
+.map-contaiter {
+  background: white;
   margin-top: 5rem;
   width: 100%;
   max-width: 500px;
@@ -135,7 +135,7 @@ li:hover {
   overflow: auto;
 }
 
-.map-contaiter:hover{
+.map-contaiter:hover {
   transform: translateY(-3px);
 }
 
@@ -242,7 +242,7 @@ li:hover {
   background: white;
   border: 1px solid #dee2e6;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .card-icon {
@@ -264,7 +264,8 @@ li:hover {
   margin-bottom: 2px;
 }
 
-.card-value, .card-link {
+.card-value,
+.card-link {
   font-size: 14px;
   color: #333;
   font-weight: 500;

@@ -113,3 +113,8 @@ func UpdateSources(c *gin.Context) {
 	}
 
 }
+
+func Cities(c *gin.Context) {
+	c.JSON(http.StatusOK, pkg.GetAllCities())
+	return
+}
