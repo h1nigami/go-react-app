@@ -14,6 +14,7 @@ import (
 	"github.com/h1nigami/go-react-app/backend/task/internal/config"
 	"github.com/h1nigami/go-react-app/backend/task/internal/database"
 	"github.com/h1nigami/go-react-app/backend/task/internal/handlers"
+	"github.com/h1nigami/go-react-app/backend/task/pkg"
 )
 
 func main() {
@@ -21,6 +22,7 @@ func main() {
 	log := setUpLogger(cfg.Env)
 	handlers.SetLogger(log)
 	database.SetLoger(log)
+	pkg.SetConfig(cfg)
 
 	var storage database.SourcesStorage
 

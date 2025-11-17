@@ -28,6 +28,7 @@ func MustLoad() *Config {
 		log.Fatalf("error: %v", err.Error())
 	}
 	CONFIG_PATH := os.Getenv("CONFIG_PATH")
+
 	if CONFIG_PATH == "" {
 		log.Fatal("путь до конфига не задан")
 	}

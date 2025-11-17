@@ -1,10 +1,22 @@
 package pkg
 
 import (
+	"context"
 	"encoding/json"
+	"log"
 	"os"
 	"regexp"
+
+	dadata "github.com/ekomobile/dadata/v2"
+	"github.com/ekomobile/dadata/v2/api/model"
+	"github.com/h1nigami/go-react-app/backend/task/internal/config"
 )
+
+var cfg *config.Config
+
+func SetConfig(c *config.Config) {
+	cfg = c
+}
 
 func PhoneNumberValidator(phone string) bool {
 	cleanedPhone := regexp.MustCompile(`\D`).ReplaceAllString(phone, "")
@@ -45,4 +57,13 @@ func GetAllCities() []map[string]any {
 		return nil
 	}
 	return cities
+}
+
+func GeoCoder(query string) []*model.Address {
+	api := dadata.NewCleanApi()
+	result, err := api.Address(context.Background(), query)
+	if err != nil {
+		log.Fatalf("error: %v", err.Error())
+	}
+	return result
 }
