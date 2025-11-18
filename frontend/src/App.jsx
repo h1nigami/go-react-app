@@ -321,7 +321,8 @@ function App() {
                         <span className="contact-icon">🏠</span>
                         <span className="contact-label">Адрес:</span>
                         <span className="contact-value">
-                          {t.addres.city}/{t.addres.street}/{t.addres.number}
+                          От: {t.addres.from.street + " " + t.addres.from.number + " "} 
+                          До:  {t.addres.to.street + " " + t.addres.to.number}
                         </span>
                       </div>
                     )}

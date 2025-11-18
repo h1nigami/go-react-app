@@ -134,7 +134,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
       const marker = new window.ymaps.Placemark(
         [task.x_from, task.y_from],
         {
-          balloonContentHeader: "",
+          balloonContentHeader: "Начало",
           balloonContentBody: `
             <div style="padding: 8px;">
               <p><strong>График работы:</strong> ${task.schedule?.start || "Не указан"} - ${task.schedule?.end || "Не указан"}</p>
@@ -168,6 +168,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
           `,
           balloonContentFooter: "",
           hintContent: task.title || "Задача",
+          iconContent:"A"
         },
         {
           preset: marker_icon,
@@ -225,7 +226,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
       const markerTo = new window.ymaps.Placemark(
         [task.x_to, task.y_to],
         {
-          balloonContentHeader: "",
+          balloonContentHeader: "Конец",
           balloonContentBody: `
             <div style="padding: 8px;">
               <p><strong>График работы:</strong> ${task.schedule?.start || "Не указан"} - ${task.schedule?.end || "Не указ"}</p>
@@ -259,9 +260,11 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
           `,
           balloonContentFooter: "",
           hintContent: task.title || "Задача",
+          iconContent:"B"
         },
         {
           preset: marker_icon,
+          iconContent:"A",
           iconColor: marker_color,
           draggable: true,
         },
