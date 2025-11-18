@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const MapComponent = ({ tasks = [], onTaskUpdate }) => {
+const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
   const mapContainer = useRef(null);
   const mapInstance = useRef(null);
   const currentMarkers = useRef([]);
@@ -349,6 +349,11 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
           zoom: 10,
           controls: ["zoomControl", "typeSelector", "fullscreenControl"],
         });
+
+        // Передаем ссылку на карту в родительский компонент
+        if (onMapReady) {
+          onMapReady(mapInstance.current);
+        }
       }
 
       refreshMarkers();

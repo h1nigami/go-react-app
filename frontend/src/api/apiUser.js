@@ -146,6 +146,7 @@ export async function logout() {
 
     if (logoutResponse.ok) {
       console.log("Logout successful");
+      localStorage.clear();
       return true;
     } else {
       console.log("Logout failed");
