@@ -19,7 +19,7 @@ func SetLoger(l *slog.Logger) {
 
 type SourcesStorage interface {
 	CreateSources(Sources *models.Sources)
-	GetSourcess(user_id any) ([]models.Sources, error)
+	GetSourcess() ([]models.Sources, error)
 	GetSourcesByid(id int) (models.Sources, error)
 	DeleteSources(id int) models.Sources
 	UpdateSources(id int, Sources models.Sources) error
@@ -62,9 +62,9 @@ func (d *DB) createTables() {
 	d.pool.AutoMigrate(&models.Sources{})
 }
 
-func (d *DB) GetSourcess(user_id any) ([]models.Sources, error) {
+func (d *DB) GetSourcess() ([]models.Sources, error) {
 	var Sourcess []models.Sources
-	result := d.pool.Where("user_id = ?", user_id).Find(&Sourcess)
+	result := d.pool.Find(&Sourcess)
 	return Sourcess, result.Error
 }
 

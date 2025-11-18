@@ -27,12 +27,7 @@ func SetLogger(l *slog.Logger) {
 var validate = validator.New(validator.WithRequiredStructEnabled())
 
 func AllSources(c *gin.Context) {
-	uid, err := c.Cookie("user_id")
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
-	Sourcess, err := storage.GetSourcess(uid)
+	Sourcess, err := storage.GetSourcess()
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err})
 		return
