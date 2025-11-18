@@ -5,6 +5,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
   const mapInstance = useRef(null);
   const currentMarkers = useRef([]);
   const originalCoords = useRef(new Map());
+  const originalCoordsTo = useRef(new Map());
 
   // Ключ для localStorage
   const STORAGE_KEY = "map_tasks_data";
@@ -55,10 +56,26 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+  // Хранит цвет маркера для каждого задания
+  const taskColorMap = useRef(new Map());
+
   const handleSave = (task, newCoords) => {
-    const updatedTask = { ...task, x: newCoords[0], y: newCoords[1] };
+    const updatedTask = { ...task, x_from: newCoords[0], y_from: newCoords[1] };
     onTaskUpdate(task.ID, updatedTask);
     originalCoords.current.delete(task.ID);
+
+    // Сохраняем обновленные задачи в localStorage
+    const allTasks = getAllTasks();
+    const updatedTasks = allTasks.map((t) =>
+      t.ID === task.ID ? updatedTask : t,
+    );
+    saveTasksToStorage(updatedTasks);
+  };
+
+  const handleSaveTo = (task, newCoords) => {
+    const updatedTask = { ...task, x_to: newCoords[0], y_to: newCoords[1] };
+    onTaskUpdate(task.ID, updatedTask);
+    originalCoordsTo.current.delete(task.ID);
 
     // Сохраняем обновленные задачи в localStorage
     const allTasks = getAllTasks();
@@ -77,6 +94,15 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
     }
   };
 
+  const handleCancelTo = (task, marker) => {
+    const original = originalCoordsTo.current.get(task.ID);
+    if (original) {
+      marker.geometry.setCoordinates(original);
+      marker.options.set("iconColor", getMarkerColor(task.priority));
+      originalCoordsTo.current.delete(task.ID);
+    }
+  };
+
   const refreshMarkers = () => {
     if (!mapInstance.current || !window.ymaps) return;
 
@@ -85,15 +111,26 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
     });
     currentMarkers.current = [];
 
-    // Используем getAllTasks() для получения данных
+    // Получаем все активные задачи
     const allTasks = getAllTasks();
     const activeTasks = allTasks.filter(
       (task) => task.x_from && task.y_from && task.x_to && task.y_to
     );
 
     activeTasks.forEach((task) => {
-      const marker_color = getMarkerColor();
+      const adrFrom = `${task.addres?.from.street} ${task.addres?.from.number}`;
+      const adrTo = `${task.addres?.to.street} ${task.addres?.to.number}`;
+
+      // Определяем цвет маркера; оба маркера одного задания используют один и тот же цвет
+      const marker_color = taskColorMap.current.has(task.ID)
+        ? taskColorMap.current.get(task.ID)
+        : (() => {
+            const color = getMarkerColor();
+            taskColorMap.current.set(task.ID, color);
+            return color;
+          })();
       const marker_icon = getMarkerIcon();
+
       const marker = new window.ymaps.Placemark(
         [task.x_from, task.y_from],
         {
@@ -102,7 +139,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
             <div style="padding: 8px;">
               <p><strong>График работы:</strong> ${task.schedule?.start || "Не указан"} - ${task.schedule?.end || "Не указан"}</p>
               <p><strong>Название:</strong> ${task.title || "Без названия"}</p>
-              <p><strong>Адрес:</strong> ${task.addres?.street || "Не указан"}</p>
+              <p><strong>Адрес:</strong> ${adrFrom || "Не указан"}</p>
               <p><strong>Статус:</strong> ${task.Is_Done ? "Выполнено" : "В процессе"}</p>
               <p><strong>Номер телефона:</strong> ${task.phone || "Не указан"}</p>
               <p><strong>Email:</strong> ${task.email || "Не указан"}</p>
@@ -147,7 +184,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
 
       marker.events.add("dragend", function (e) {
         const newCoords = e.get("target").geometry.getCoordinates();
-        marker.options.set("iconColor", getMarkerColor(task.priority));
+        marker.options.set("iconColor", marker_color);
         marker.balloon.open();
 
         setTimeout(() => {
@@ -185,8 +222,99 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
         console.log("Перетаскивание на:", coords);
       });
 
+      const markerTo = new window.ymaps.Placemark(
+        [task.x_to, task.y_to],
+        {
+          balloonContentHeader: "",
+          balloonContentBody: `
+            <div style="padding: 8px;">
+              <p><strong>График работы:</strong> ${task.schedule?.start || "Не указан"} - ${task.schedule?.end || "Не указ"}</p>
+              <p><strong>Название:</strong> ${task.title || "Без названия"}</p>
+              <p><strong>Адрес:</strong> ${adrTo || "Не указан"}</p>
+              <p><strong>Статус:</strong> ${task.Is_Done ? "Выполнено" : "В процессе"}</p>
+              <p><strong>Номер телефона:</strong> ${task.phone || "Не указан"}</p>
+              <p><strong>Email:</strong> ${task.email || "Не указан"}</p>
+              ${task.description ? `<p><strong>Описание:</strong> ${task.description}</p>` : ""}
+              <div style="margin-top: 10px; display: flex; gap: 8px;">
+                <button id="saveTo-btn-${task.ID}" style="
+                  padding: 6px 12px; 
+                  background-color: #4CAF50; 
+                  color: white; 
+                  border: none; 
+                  border-radius: 4px; 
+                  cursor: pointer;
+                  font-size: 12px;
+                ">Сохранить</button>
+                <button id="cancelTo-btn-${task.ID}" style="
+                  padding: 6px 12px; 
+                  background-color: #f44336; 
+                  color: white; 
+                  border: none; 
+                  border-radius: 4px; 
+                  cursor: pointer;
+                  font-size: 12px;
+                ">Отменить</button>
+              </div>
+            </div>
+          `,
+          balloonContentFooter: "",
+          hintContent: task.title || "Задача",
+        },
+        {
+          preset: marker_icon,
+          iconColor: marker_color,
+          draggable: true,
+        },
+      );
+      markerTo.events.add("dragstart", function () {
+        originalCoordsTo.current.set(task.ID, markerTo.geometry.getCoordinates());
+        markerTo.options.set("preset", "islands#blueIcon");
+        markerTo.options.set("iconColor", "#1e90ff");
+      });
+
+      markerTo.events.add("dragend", function (e) {
+        const newCoords = e.get("target").geometry.getCoordinates();
+        markerTo.options.set("iconColor", marker_color);
+        markerTo.balloon.open();
+        setTimeout(() => {
+          const saveBtn = document.querySelector(`#saveTo-btn-${task.ID}`);
+          const cancelBtn = document.querySelector(`#cancelTo-btn-${task.ID}`);
+
+          if (saveBtn) {
+            saveBtn.replaceWith(saveBtn.cloneNode(true));
+            const newSaveBtn = document.querySelector(`#saveTo-btn-${task.ID}`);
+            newSaveBtn.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSaveTo(task, newCoords);
+              markerTo.balloon.close();
+            });
+          }
+
+          if (cancelBtn) {
+            cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+            const newCancelBtn = document.querySelector(
+              `#cancelTo-btn-${task.ID}`,
+            );
+            newCancelBtn.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleCancelTo(task, markerTo);
+              markerTo.balloon.close();
+            });
+          }
+        }, 100);
+      });
+
+      markerTo.events.add("drag", function (e) {
+        const coords = e.get("target").geometry.getCoordinates();
+        console.log("Перетаскивание на:", coords);
+      });
+      
       mapInstance.current.geoObjects.add(marker);
+      mapInstance.current.geoObjects.add(markerTo);
       currentMarkers.current.push(marker);
+      currentMarkers.current.push(markerTo);
     });
   };
 

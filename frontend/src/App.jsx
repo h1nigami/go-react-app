@@ -306,12 +306,12 @@ function App() {
                   <div className="contact-info">
                     <h3 className="contact-title">{t.title}</h3>
 
-                    {t.x && t.y && (
+                    {t.x_to && t.y_to && t.y_from && t.x_from  && (
                       <div className="contact-item">
                         <span className="contact-icon">📍</span>
                         <span className="contact-label">Координаты:</span>
                         <span className="contact-value">
-                          ({t.x}, {t.y})
+                          Начало: ({t.x_from}, {t.y_from}) Конец: ({t.x_to}, {t.y_to})
                         </span>
                       </div>
                     )}
