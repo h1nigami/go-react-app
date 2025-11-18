@@ -17,6 +17,7 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
   const [schedule, setSchedule] = useState(null);
+  // eslint-disable-next-line
   const [coordinates, setCoordinates] = useState({
     x_from: "",
     y_from: "",
@@ -34,10 +35,12 @@ function App() {
       street: "",
       city: "",
       country: "",
+      number: "",
     },
   });
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [mapRef, setMapRef] = useState(null);
 
   useEffect(() => {
     getTask()
@@ -123,6 +126,29 @@ function App() {
   const fetchTasks = async () => {
     const tasksfromserver = await getTask();
     setTasks(tasksfromserver);
+  };
+
+  // Функция для зума к координатам
+  const zoomToCoordinates = (coords) => {
+    if (mapRef && coords) {
+      mapRef.setCenter([coords.x, coords.y], 10, {
+        duration: 300
+      });
+    }
+  };
+
+  // Обработчик клика на координаты "От"
+  const handleZoomFrom = (task) => {
+    if (task.x_from && task.y_from) {
+      zoomToCoordinates({ x: task.x_from, y: task.y_from });
+    }
+  };
+
+  // Обработчик клика на координаты "До"
+  const handleZoomTo = (task) => {
+    if (task.x_to && task.y_to) {
+      zoomToCoordinates({ x: task.x_to, y: task.y_to });
+    }
   };
 
   return (
@@ -305,9 +331,24 @@ function App() {
                       <div className="contact-item">
                         <span className="contact-icon">📍</span>
                         <span className="contact-label">Координаты:</span>
-                        <span className="contact-value">
-                          Начало: ({t.x_from}, {t.y_from}) Конец: ({t.x_to}, {t.y_to})
-                        </span>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                          <span 
+                            className="contact-value"
+                            style={{ cursor: "pointer", color: "#2196F3", textDecoration: "underline" }}
+                            onClick={() => handleZoomFrom(t)}
+                            title="Нажмите для приближения к начальной точке"
+                          >
+                            Начало: ({t.x_from}, {t.y_from})
+                          </span>
+                          <span 
+                            className="contact-value"
+                            style={{ cursor: "pointer", color: "#2196F3", textDecoration: "underline" }}
+                            onClick={() => handleZoomTo(t)}
+                            title="Нажмите для приближения к конечной точке"
+                          >
+                            Конец: ({t.x_to}, {t.y_to})
+                          </span>
+                        </div>
                       </div>
                     )}
 
@@ -376,7 +417,7 @@ function App() {
           </ul>
         </div>
         <div className="map-contaiter">
-          <MapComponent tasks={tasks} onTaskUpdate={updateTask}></MapComponent>
+          <MapComponent tasks={tasks} onTaskUpdate={updateTask} onMapReady={setMapRef}></MapComponent>
         </div>
       </div>
     </div>
