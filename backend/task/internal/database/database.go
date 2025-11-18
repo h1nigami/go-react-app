@@ -18,7 +18,7 @@ func SetLoger(l *slog.Logger) {
 }
 
 type SourcesStorage interface {
-	CreateSources(Sources *models.Sources, user_id int)
+	CreateSources(Sources *models.Sources)
 	GetSourcess(user_id any) ([]models.Sources, error)
 	GetSourcesByid(id int) (models.Sources, error)
 	DeleteSources(id int) models.Sources
@@ -74,8 +74,7 @@ func (d *DB) GetSourcesByid(id int) (models.Sources, error) {
 	return Sources, result.Error
 }
 
-func (d *DB) CreateSources(Sources *models.Sources, user_id int) {
-	Sources.UserID = user_id
+func (d *DB) CreateSources(Sources *models.Sources) {
 	d.pool.Create(&Sources)
 }
 

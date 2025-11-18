@@ -9,7 +9,6 @@ import {
 } from "./api/apiTask";
 import { motion, AnimatePresence } from "framer-motion";
 import EditDropdown from "./components/editDropDown";
-import AuthForm from "./components/authForm";
 import MapComponent from "./components/map";
 import WorkScheduleSelect from "./components/scheduleComponent";
 import scheduleDays from "./scripts/schedulePrintScript";
@@ -128,10 +127,6 @@ function App() {
 
   return (
     <div>
-      <div>
-        <AuthForm />
-      </div>
-
       <div className="layot">
         <div className="todo-card">
           <h1>Создать источник</h1>

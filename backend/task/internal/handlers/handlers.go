@@ -55,16 +55,6 @@ func GetSourcesById(c *gin.Context) {
 
 func CreateSources(c *gin.Context) {
 	var Sources models.Sources
-	uidStr, err := c.Cookie("user_id")
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "user id cookie not found"})
-		return
-	}
-	uid, err := strconv.Atoi(uidStr)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
-		return
-	}
 	if err := c.BindJSON(&Sources); err != nil {
 		log.Info("Data from frontend", slog.Any("source", Sources))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
@@ -80,7 +70,7 @@ func CreateSources(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 			return
 		}
-		storage.CreateSources(&Sources, uid)
+		storage.CreateSources(&Sources)
 		c.JSON(http.StatusCreated, Sources)
 	}
 }

@@ -15,7 +15,7 @@ type Sources struct {
 	Yto           float32 `json:"y_to"`
 	Addres        `json:"addres"`
 	ScheduleInput `json:"schedule"` //переделать под график работы
-	UserID        int               `json:"user_id"` // Внешний ключ
+	//UserID        int               `json:"user_id"` // Внешний ключ
 }
 
 type ScheduleInput struct {
