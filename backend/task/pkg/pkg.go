@@ -3,7 +3,6 @@ package pkg
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"os"
 	"regexp"
 
@@ -59,11 +58,11 @@ func GetAllCities() []map[string]any {
 	return cities
 }
 
-func GeoCoder(query string) []*model.Address {
+func GeoCoder(query string) ([]*model.Address, error) {
 	api := dadata.NewCleanApi()
 	result, err := api.Address(context.Background(), query)
 	if err != nil {
-		log.Fatalf("error: %v", err.Error())
+		return nil, err
 	}
-	return result
+	return result, nil
 }

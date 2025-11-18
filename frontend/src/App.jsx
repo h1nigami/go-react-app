@@ -1,6 +1,12 @@
 import "./styles/App.css";
 import { useEffect, useState } from "react";
-import { createTask, deleteTask, geoCode, getTask, updateTask } from "./api/apiTask";
+import {
+  createTask,
+  deleteTask,
+  geoCode,
+  getTask,
+  updateTask,
+} from "./api/apiTask";
 import { motion, AnimatePresence } from "framer-motion";
 import EditDropdown from "./components/editDropDown";
 import AuthForm from "./components/authForm";
@@ -12,12 +18,24 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
   const [schedule, setSchedule] = useState(null);
-  const [coordinates, setCoordinates] = useState({ x: "", y: "" });
+  const [coordinates, setCoordinates] = useState({
+    x_from: "",
+    y_from: "",
+    x_to: "",
+    y_to: "",
+  });
   const [address, setAddress] = useState({
-    street: "",
-    city: "",
-    country: "",
-    number: "",
+    from: {
+      street: "",
+      city: "",
+      country: "",
+      number: "",
+    },
+    to: {
+      street: "",
+      city: "",
+      country: "",
+    },
   });
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -32,9 +50,18 @@ function App() {
     e.preventDefault();
     if (!newTask.trim()) return;
     try {
-      const coords = await geoCode(`${address.country} ${address.city} ${address.street} ${address.number}`);
-      console.log(coords)
-      setCoordinates({ x: coords.x, y: coords.y });
+      const coordsFrom = await geoCode(
+        `${address.from.country} ${address.from.city} ${address.from.street} ${address.from.number}`,
+      );
+      const coordsTo = await geoCode(
+        `${address.to.country} ${address.to.city} ${address.to.street} ${address.to.number}`,
+      );
+      setCoordinates({
+        x_to: coordsTo.x,
+        y_to: coordsTo.y,
+        x_from: coordsFrom.x,
+        y_from: coordsFrom.y,
+      });
       const created = await createTask({
         title: newTask,
         schedule: {
@@ -42,13 +69,23 @@ function App() {
           start: schedule.start,
           end: schedule.end,
         },
-        x: coords.x ? parseFloat(coords.x) : null,
-        y: coords.y ? parseFloat(coords.y) : null,
+        x_from: coordsFrom.x ? parseFloat(coordsFrom.x) : null,
+        y_from: coordsFrom.y ? parseFloat(coordsFrom.y) : null,
+        x_to: coordsTo.x ? parseFloat(coordsTo.x) : null,
+        y_to: coordsTo.y ? parseFloat(coordsTo.y) : null,
         addres: {
-          street: address.street,
-          city: address.city,
-          country: address.country,
-          number: address.number,
+          from: {
+            street: address.from.street,
+            city: address.from.city,
+            country: address.from.country,
+            number: address.from.number,
+          },
+          to: {
+            street: address.to.street,
+            city: address.to.city,
+            country: address.to.country,
+            number: address.to.number,
+          },
         },
         email: email,
         phoneNumber: phoneNumber,
@@ -59,12 +96,20 @@ function App() {
     } finally {
       setNewTask("");
       setSchedule(null);
-      setCoordinates({ x: "", y: "" });
+      setCoordinates({ x_from: "", y_from: "", x_to: "", y_to: "" });
       setAddress({
-        street: "",
-        city: "",
-        country: "",
-        number: "",
+        from: {
+          street: "",
+          city: "",
+          country: "",
+          number: "",
+        },
+        to: {
+          street: "",
+          city: "",
+          country: "",
+          number: "",
+        },
       });
       setEmail("");
       setPhoneNumber("");
@@ -80,8 +125,6 @@ function App() {
     const tasksfromserver = await getTask();
     setTasks(tasksfromserver);
   };
-
-
 
   return (
     <div>
@@ -108,7 +151,7 @@ function App() {
               style={{ padding: "0.5rem", width: "80%" }}
             />
             <WorkScheduleSelect value={schedule} onChange={setSchedule} />
-{/* 
+            {/* 
             <div style={{ display: "flex", gap: "0.5rem", width: "80%" }}>
               <input
                 type="number"
@@ -131,40 +174,6 @@ function App() {
             </div>
 */}
             <input
-              value={address.country}
-              onChange={(e) =>
-                setAddress((prev) => ({ ...prev, country: e.target.value }))
-              }
-              placeholder="Страна"
-              style={{ padding: "0.5rem", width: "80%" }}
-            />
-            <input
-              list="cities"
-              value={address.city}
-              onChange={(e) =>
-                setAddress((prev) => ({ ...prev, city: e.target.value }))
-              }
-              placeholder="Город"
-              style={{ padding: "0.5rem", width: "80%" }}
-            />
-
-            <input
-              value={address.street}
-              onChange={(e) =>
-                setAddress((prev) => ({ ...prev, street: e.target.value }))
-              }
-              placeholder="Улица"
-              style={{ padding: "0.5rem", width: "80%" }}
-            />
-            <input
-              value={address.number}
-              onChange={(e) =>
-                setAddress((prev) => ({ ...prev, number: e.target.value }))
-              }
-              placeholder="Номер дома"
-              style={{ padding: "0.5rem", width: "80%" }}
-            />
-            <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -184,6 +193,101 @@ function App() {
               }}
               placeholder="+7 (999) 123-45-67"
             />
+            <h1>От</h1>
+            <input
+              value={address.from.country}
+              onChange={(e) =>
+                setAddress((prev) => ({
+                  ...prev,
+                  from: { ...prev.from, country: e.target.value },
+                }))
+              }
+              placeholder="Страна"
+              style={{ padding: "0.5rem", width: "80%" }}
+            />
+            <input
+              list="cities"
+              value={address.from.city}
+              onChange={(e) =>
+                setAddress((prev) => ({
+                  ...prev,
+                  from: { ...prev.from, city: e.target.value },
+                }))
+              }
+              placeholder="Город"
+              style={{ padding: "0.5rem", width: "80%" }}
+            />
+
+            <input
+              value={address.from.street}
+              onChange={(e) =>
+                setAddress((prev) => ({
+                  ...prev,
+                  from: { ...prev.from, street: e.target.value },
+                }))
+              }
+              placeholder="Улица"
+              style={{ padding: "0.5rem", width: "80%" }}
+            />
+            <input
+              value={address.from.number}
+              onChange={(e) =>
+                setAddress((prev) => ({
+                  ...prev,
+                  from: { ...prev.from, number: e.target.value },
+                }))
+              }
+              placeholder="Номер дома"
+              style={{ padding: "0.5rem", width: "80%" }}
+            />
+            <h1>До</h1>
+            <input
+              value={address.to.country}
+              onChange={(e) =>
+                setAddress((prev) => ({
+                  ...prev,
+                  to: { ...prev.to, country: e.target.value },
+                }))
+              }
+              placeholder="Страна"
+              style={{ padding: "0.5rem", width: "80%" }}
+            />
+            <input
+              list="cities"
+              value={address.to.city}
+              onChange={(e) =>
+                setAddress((prev) => ({
+                  ...prev,
+                  to: { ...prev.to, city: e.target.value },
+                }))
+              }
+              placeholder="Город"
+              style={{ padding: "0.5rem", width: "80%" }}
+            />
+
+            <input
+              value={address.to.street}
+              onChange={(e) =>
+                setAddress((prev) => ({
+                  ...prev,
+                  to: { ...prev.to, street: e.target.value },
+                }))
+              }
+              placeholder="Улица"
+              style={{ padding: "0.5rem", width: "80%" }}
+            />
+            <input
+              value={address.to.number}
+              onChange={(e) =>
+                setAddress((prev) => ({
+                  ...prev,
+                  to: { ...prev.to, number: e.target.value },
+                }))
+              }
+              placeholder="Номер дома"
+              style={{ padding: "0.5rem", width: "80%" }}
+            />
+
             <button type="submit" className="button">
               Добавить
             </button>

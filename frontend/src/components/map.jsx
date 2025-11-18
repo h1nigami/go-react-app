@@ -7,14 +7,14 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
   const originalCoords = useRef(new Map());
 
   // Ключ для localStorage
-  const STORAGE_KEY = 'map_tasks_data';
+  const STORAGE_KEY = "map_tasks_data";
 
   // Сохранение задач в localStorage
   const saveTasksToStorage = (tasksData) => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
     } catch (error) {
-      console.warn('Не удалось сохранить задачи в localStorage:', error);
+      console.warn("Не удалось сохранить задачи в localStorage:", error);
     }
   };
 
@@ -24,7 +24,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
       const saved = localStorage.getItem(STORAGE_KEY);
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
-      console.warn('Не удалось загрузить задачи из localStorage:', error);
+      console.warn("Не удалось загрузить задачи из localStorage:", error);
       return [];
     }
   };
@@ -34,32 +34,37 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
     return tasks.length > 0 ? tasks : loadTasksFromStorage();
   };
 
-  const getMarkerIcon = (priority) => {
-    const icons = {
-      high: "islands#redIcon",
-      medium: "islands#orangeIcon",
-      low: "islands#greenIcon",
-    };
-    return icons[priority] || "islands#blueIcon";
+  const getMarkerIcon = () => {
+    const icons = [
+      "islands#redIcon",
+      "islands#orangeIcon",
+      "islands#greenIcon",
+    ];
+    return icons[Math.floor(Math.random() * icons.length)];
   };
 
-  const getMarkerColor = (priority) => {
-    const colors = {
-      high: "#ff0000",
-      medium: "#ff8c00",
-      low: "#32cd32",
-    };
-    return colors[priority] || "#1e90ff";
+  const getMarkerColor = () => {
+    const colors = [
+      "#ff0000",
+      "#ff8c00",
+      "#32cd32",
+      "#1e90ff",
+      "#ff1493",
+      "#00bfff",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
   };
 
   const handleSave = (task, newCoords) => {
     const updatedTask = { ...task, x: newCoords[0], y: newCoords[1] };
     onTaskUpdate(task.ID, updatedTask);
     originalCoords.current.delete(task.ID);
-    
+
     // Сохраняем обновленные задачи в localStorage
     const allTasks = getAllTasks();
-    const updatedTasks = allTasks.map(t => t.ID === task.ID ? updatedTask : t);
+    const updatedTasks = allTasks.map((t) =>
+      t.ID === task.ID ? updatedTask : t,
+    );
     saveTasksToStorage(updatedTasks);
   };
 
@@ -83,12 +88,14 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
     // Используем getAllTasks() для получения данных
     const allTasks = getAllTasks();
     const activeTasks = allTasks.filter(
-      (task) => task.x && task.y && !task.Is_Done,
+      (task) => task.x_from && task.y_from && task.x_to && task.y_to
     );
 
     activeTasks.forEach((task) => {
+      const marker_color = getMarkerColor();
+      const marker_icon = getMarkerIcon();
       const marker = new window.ymaps.Placemark(
-        [task.x, task.y],
+        [task.x_from, task.y_from],
         {
           balloonContentHeader: "",
           balloonContentBody: `
@@ -126,8 +133,8 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
           hintContent: task.title || "Задача",
         },
         {
-          preset: getMarkerIcon(task.priority),
-          iconColor: getMarkerColor(task.priority),
+          preset: marker_icon,
+          iconColor: marker_color,
           draggable: true,
         },
       );
@@ -238,7 +245,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate }) => {
   useEffect(() => {
     if (mapInstance.current && window.ymaps) {
       refreshMarkers();
-    }// eslint-disable-next-line react-hooks/exhaustive-deps
+    } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapInstance.current, window.ymaps]);
 
   const allTasks = getAllTasks();

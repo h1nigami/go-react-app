@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -39,7 +38,6 @@ func AllSources(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, Sourcess)
-	fmt.Printf("Айди клиента %v\n", uid)
 }
 
 func GetSourcesById(c *gin.Context) {
@@ -120,7 +118,13 @@ func Cities(c *gin.Context) {
 }
 
 func GeoCode(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"x": pkg.GeoCoder(c.Param("addres"))[0].GeoLat,
-		"y": pkg.GeoCoder(c.Param("addres"))[0].GeoLon})
-	return
+	addres, err := pkg.GeoCoder(c.Param("addres"))
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"x": 1, "y": 1})
+	}
+	coords := map[string]any{
+		"x": addres[0].GeoLat,
+		"y": addres[0].GeoLon,
+	}
+	c.JSON(http.StatusOK, coords)
 }

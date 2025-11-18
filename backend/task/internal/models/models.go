@@ -9,8 +9,10 @@ type Sources struct {
 	Email         string  `json:"email" validate:"required,email"`       //добавить валидацию
 	Phone_Number  string  `json:"phonenumber" validate:"required",e164"` //добавить валидацию
 	Title         string  `json:"title"`
-	X             float32 `json:"x"`
-	Y             float32 `json:"y"`
+	Xfrom         float32 `json:"x_from"`
+	Yfrom         float32 `json:"y_from"`
+	Xto           float32 `json:"x_to"`
+	Yto           float32 `json:"y_to"`
 	Addres        `json:"addres"`
 	ScheduleInput `json:"schedule"` //переделать под график работы
 	UserID        int               `json:"user_id"` // Внешний ключ
@@ -23,10 +25,24 @@ type ScheduleInput struct {
 }
 
 type Addres struct {
-	Street   string `json:"street"`
-	Number   string `json:"number"`
-	City     string `json:"city"`
-	Country  string `json:"country"`
-	District string `json:"district"`
-	Subject  string `json:"subject"`
+	From `json:"from"`
+	To   `json:"to"`
+}
+
+type From struct {
+	StreetFrom   string `json:"street"`
+	NumberFrom   string `json:"number"`
+	CityFrom     string `json:"city"`
+	CountryFrom  string `json:"country"`
+	DistrictFrom string `json:"district"`
+	SubjectFrom  string `json:"subject"`
+}
+
+type To struct {
+	StreetTo   string `json:"street"`
+	NumberTo   string `json:"number"`
+	CityTo     string `json:"city"`
+	CountryTo  string `json:"country"`
+	DistrictTo string `json:"district"`
+	SubjectTo  string `json:"subject"`
 }
