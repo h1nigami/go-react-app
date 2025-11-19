@@ -264,7 +264,6 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
         },
         {
           preset: marker_icon,
-          iconContent:"A",
           iconColor: marker_color,
           draggable: true,
         },
@@ -386,7 +385,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
 
   const allTasks = getAllTasks();
   const activeTasksCount = allTasks.filter(
-    (task) => task.x && task.y && !task.Is_Done,
+    (task) => task.x && task.y 
   ).length;
 
   return (
