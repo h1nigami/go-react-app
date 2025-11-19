@@ -3,7 +3,7 @@ body {
   padding: 0;
   background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
   font-family: "Inter", sans-serif;
-  display: flex;
+  display: block;
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
@@ -11,6 +11,24 @@ body {
 
 /* Карточка */
 .todo-card {
+  margin-left: 200px;
+  background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+  margin-top: 5rem;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: auto;
+  backdrop-filter: blur(10px);
+}
+
+.todo-card-result {
   background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
   margin-top: 5rem;
   width: 100%;
@@ -37,6 +55,25 @@ body {
 
 /* Заголовок */
 .todo-card h1 {
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  font-size: 1.8rem;
+}
+
+.todo-card-result:hover {
+  transform: translateY(-5px);
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Заголовок */
+.todo-card-result h1 {
   margin-bottom: 1.5rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
@@ -144,11 +181,9 @@ li:hover {
     0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-/* ... остальной код ... */
 
 .layot {
   display: flex;
-  flex-direction: row;
   gap: 15px;
 }
 

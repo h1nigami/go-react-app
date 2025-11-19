@@ -313,6 +313,9 @@ function App() {
               Добавить
             </button>
           </form>
+          
+        </div>
+        <div className="todo-card-result">
           <ul>
             <AnimatePresence>
               {tasks.map((t) => (
