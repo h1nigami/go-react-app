@@ -89,7 +89,6 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
     const original = originalCoords.current.get(task.ID);
     if (original) {
       marker.geometry.setCoordinates(original);
-      marker.options.set("iconColor", getMarkerColor(task.priority));
       originalCoords.current.delete(task.ID);
     }
   };
@@ -98,7 +97,6 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
     const original = originalCoordsTo.current.get(task.ID);
     if (original) {
       marker.geometry.setCoordinates(original);
-      marker.options.set("iconColor", getMarkerColor(task.priority));
       originalCoordsTo.current.delete(task.ID);
     }
   };
@@ -385,7 +383,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
 
   const allTasks = getAllTasks();
   const activeTasksCount = allTasks.filter(
-    (task) => task.x && task.y 
+    (task) => task.x_from && task.y_from 
   ).length;
 
   return (
@@ -393,8 +391,20 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
       <h2
         style={{
           textAlign: "center",
-          marginBottom: "1rem",
-          color: "#333",
+          marginBottom: "1.5rem",
+          color: "#2c3e50",
+          fontSize: "1.75rem",
+          fontWeight: "600",
+          padding: "12px 20px",
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          color: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 15px rgba(102, 126, 234, 0.3)",
+          display: "inline-block",
+          minWidth: "280px",
+          marginLeft: "50%",
+          transform: "translateX(-50%)",
+          whiteSpace: "nowrap",
         }}
       >
         Карта источников ({activeTasksCount})
@@ -405,9 +415,20 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
         style={{
           width: "100%",
           height: "500px",
-          border: "2px solid #ddd",
-          borderRadius: "8px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          border: "3px solid #e8f4fd",
+          borderRadius: "16px",
+          boxShadow: "0 8px 32px rgba(31, 38, 135, 0.37)",
+          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+          overflow: "hidden",
+          transition: "all 0.3s ease",
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.boxShadow = "0 12px 40px rgba(31, 38, 135, 0.5)";
+          e.target.style.transform = "translateY(-2px)";
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.boxShadow = "0 8px 32px rgba(31, 38, 135, 0.37)";
+          e.target.style.transform = "translateY(0)";
         }}
       />
 
@@ -415,14 +436,30 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
         <div
           style={{
             textAlign: "center",
-            padding: "2rem",
-            color: "#666",
+            padding: "3rem 2rem",
+            color: "#5a6c7d",
+            fontSize: "1.1rem",
             fontStyle: "italic",
-            backgroundColor: "#f9f9f9",
-            borderRadius: "4px",
-            marginTop: "1rem",
+            background: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+            borderRadius: "16px",
+            marginTop: "1.5rem",
+            boxShadow: "0 6px 20px rgba(252, 182, 159, 0.3)",
+            border: "2px solid rgba(255, 255, 255, 0.8)",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
+          <div
+            style={{
+              position: "absolute",
+              top: "10px",
+              right: "10px",
+              fontSize: "2rem",
+              opacity: "0.3",
+            }}
+          >
+            📍
+          </div>
           Нет активных задач с координатами для отображения на карте
         </div>
       )}

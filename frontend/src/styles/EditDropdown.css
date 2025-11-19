@@ -4,22 +4,27 @@
 }
 
 .dropdown-button {
-  background-color: #646cff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
   color: white;
-  padding: 0.5rem;
-  border-radius: 8px;
+  padding: 0.75rem;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
   margin-top: 1rem;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  font-weight: 500;
 }
 
 .dropdown-button:hover {
-  background-color: #535bf2;
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 .dropdown-button:active {
-  transform: scale(0.98);
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .dropdown-menu {
@@ -28,42 +33,51 @@
   position: absolute;
   top: 110%;
   left: 0;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  padding: 0.5rem;
+  background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1rem;
   z-index: 10;
-  min-width: 160px;
-  animation: fadeIn 0.2s ease-in-out;
+  min-width: 180px;
+  animation: fadeIn 0.3s ease-in-out;
   column-gap: 2rem;
+  backdrop-filter: blur(15px);
 }
 
 .dropdown-menu button {
   width: 90%;
   max-width: 300px;
-  padding: 0.75rem;
-  background-color: #6366f1;
-  color: white;
-  border: none;
-  border-radius: 8px;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #4c4c72 0%, #3a3a52 100%);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 500;
-  transition:
-    background 0.2s ease,
-    transform 0.1s ease;
+  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
 }
 
 .dropdown-menu button:hover {
-  background-color: #f2f2ff;
+  background: linear-gradient(135deg, #5c5c82 0%, #4a4a62 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-menu button:last-child {
+  margin-bottom: 0;
 }
 
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-5px);
+    transform: translateY(-10px) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }

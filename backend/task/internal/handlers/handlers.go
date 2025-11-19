@@ -105,6 +105,7 @@ func GeoCode(c *gin.Context) {
 	addres, err := pkg.GeoCoder(c.Param("addres"))
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"x": 1, "y": 1})
+		return
 	}
 	coords := map[string]any{
 		"x": addres[0].GeoLat,

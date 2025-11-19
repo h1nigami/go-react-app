@@ -7,18 +7,24 @@
 .ws-toggle {
   width: 90%;
   max-width: 300px;
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
+  padding: 0.875rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   outline: none;
   font-size: 1rem;
-  transition:
-    border 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: all 0.3s ease;
   box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  backdrop-filter: blur(10px);
 }
+
 .ws-toggle:focus {
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+  box-shadow: 
+    0 0 0 3px rgba(102, 126, 234, 0.2),
+    0 4px 12px rgba(102, 126, 234, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #667eea;
 }
 
 .ws-dropdown {
@@ -27,74 +33,127 @@
   left: 0;
   width: 100%;
   z-index: 1200;
-  background: #fff;
-  border: 1px solid #e6e8ef;
-  border-radius: 12px;
-  padding: 12px;
-  box-shadow: 0 8px 30px rgba(18, 25, 40, 0.06);
+  background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
 }
 
 .ws-days {
-  position: flex;
+  display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .ws-day-item {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 8px;
-  background: #f5f6fb;
-  border-radius: 8px;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
   cursor: pointer;
   user-select: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+.ws-day-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
 }
 
 .ws-day-item.selected {
-  background: #eef2ff;
-  border: 1px solid #c7d2fe;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .ws-day-item input {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
+  accent-color: #667eea;
 }
 
 .ws-time {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .ws-time-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
+}
+
+.ws-time-item label {
+  color: #cbd5e1;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.ws-time-item input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.ws-time-item input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .ws-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 10px;
+  margin-top: 16px;
 }
 
 .ws-clear {
   flex: 1;
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid #e6e8ef;
-  background: #fff;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
   cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.ws-clear:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
 }
 
 .ws-save {
   flex: 1;
-  padding: 8px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 10px;
   border: none;
-  background: green;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.ws-save:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
