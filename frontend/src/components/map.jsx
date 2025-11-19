@@ -319,48 +319,109 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
   };
 
   // Инициализация карты и загрузка данных
-  useEffect(() => {
+   useEffect(() => {
     const loadMaps = () => {
-      if (window.ymaps) {
-        initMap();
-        return;
-      }
+      try {
+        if (window.ymaps) {
+          initMap();
+          return;
+        }
 
-      const script = document.createElement("script");
-      script.src = "https://api-maps.yandex.ru/2.1/?lang=ru_RU";
-      script.onload = () => {
-        window.ymaps.ready(() => initMap());
-      };
-      document.head.appendChild(script);
+        const script = document.createElement("script");
+        script.src = "https://api-maps.yandex.ru/2.1/?lang=ru_RU";
+        script.onload = () => {
+          try {
+            window.ymaps.ready(() => initMap());
+          } catch (error) {
+            console.error("Ошибка при инициализации Yandex Maps:", error);
+          }
+        };
+        script.onerror = (error) => {
+          console.error("Ошибка загрузки скрипта Yandex Maps:", error);
+        };
+        document.head.appendChild(script);
+      } catch (error) {
+        console.error("Общая ошибка при загрузке карт:", error);
+      }
     };
 
     const initMap = () => {
-      if (!mapContainer.current) return;
+      try {
+        if (!mapContainer.current) return;
 
-      const ymaps = window.ymaps;
-      if (!ymaps || typeof ymaps.Map !== "function") return;
+        const ymaps = window.ymaps;
+        if (!ymaps || typeof ymaps.Map !== "function") return;
 
-      if (!mapInstance.current) {
-        mapInstance.current = new ymaps.Map(mapContainer.current, {
-          center: [58.01, 56.25], //Пермь
-          zoom: 10,
-          controls: ["zoomControl", "typeSelector", "fullscreenControl"],
-        });
+        if (!mapInstance.current) {
+          mapInstance.current = new ymaps.Map(mapContainer.current, {
+            center: [58.01, 56.25], //Пермь
+            zoom: 10,
+            controls: ["zoomControl", "typeSelector", "fullscreenControl"],
+          });
 
-        // Передаем ссылку на карту в родительский компонент
-        if (onMapReady) {
-          onMapReady(mapInstance.current);
+          // Передаем ссылку на карту в родительский компонент
+          if (onMapReady) {
+            onMapReady(mapInstance.current);
+          }
+
+          // Загружаем задачи из localStorage и обновляем маркеры
+          const savedTasks = loadTasksFromStorage();
+          if (savedTasks.length > 0) {
+            refreshMarkers();
+          }
+
+          // Добавляем обработчик изменения размера контейнера
+          const resizeObserver = new ResizeObserver((entries) => {
+            try {
+              if (entries.length > 0 && mapInstance.current) {
+                const { width, height } = entries[0].contentRect;
+                if (width > 0 && height > 0) {
+                  // Небольшая задержка для стабилизации размеров
+                  setTimeout(() => {
+                    if (mapInstance.current) {
+                      try {
+                        mapInstance.current.container.fitToViewport();
+                      } catch (error) {
+                        console.warn("Ошибка при подгонке размеров карты:", error);
+                      }
+                    }
+                  }, 100);
+                }
+              }
+            } catch (error) {
+              console.warn("Ошибка в обработчике изменения размера:", error);
+            }
+          });
+
+          if (mapContainer.current) {
+            resizeObserver.observe(mapContainer.current);
+          }
+
+          // Сохраняем reference на observer для очистки
+          mapInstance.current._resizeObserver = resizeObserver;
         }
-      }
 
-      refreshMarkers();
+        refreshMarkers();
+      } catch (error) {
+        console.error("Ошибка при инициализации карты:", error);
+      }
     };
+
     loadMaps();
 
     return () => {
-      if (mapInstance.current) {
-        mapInstance.current.destroy();
-        mapInstance.current = null;
+      try {
+        if (mapInstance.current) {
+          // Отключаем observer при размонтировании
+          if (mapInstance.current._resizeObserver) {
+            mapInstance.current._resizeObserver.disconnect();
+            delete mapInstance.current._resizeObserver;
+          }
+          mapInstance.current.destroy();
+          mapInstance.current = null;
+        }
+      } catch (error) {
+        console.warn("Ошибка при очистке карты:", error);
       }
     };
   }, []); // eslint-disable-line
@@ -386,7 +447,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
     (task) => task.x_from && task.y_from 
   ).length;
 
-  return (
+   return (
     <div style={{ marginTop: "2rem" }}>
       <h2
         style={{
@@ -397,6 +458,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
           fontWeight: "600",
           padding: "12px 20px",
           background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          // eslint-disable-next-line
           color: "white",
           borderRadius: "12px",
           boxShadow: "0 4px 15px rgba(102, 126, 234, 0.3)",
@@ -410,8 +472,8 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
         Карта источников ({activeTasksCount})
       </h2>
 
+      {/* Фиксированный контейнер для карты */}
       <div
-        ref={mapContainer}
         style={{
           width: "100%",
           height: "500px",
@@ -421,6 +483,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
           background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
           overflow: "hidden",
           transition: "all 0.3s ease",
+          position: "relative", /* Для правильного позиционирования placeholder */
         }}
         onMouseEnter={(e) => {
           e.target.style.boxShadow = "0 12px 40px rgba(31, 38, 135, 0.5)";
@@ -430,39 +493,64 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
           e.target.style.boxShadow = "0 8px 32px rgba(31, 38, 135, 0.37)";
           e.target.style.transform = "translateY(0)";
         }}
-      />
-
-      {activeTasksCount === 0 && (
+      >
+        {/* Карта всегда занимает весь контейнер */}
         <div
+          ref={mapContainer}
           style={{
-            textAlign: "center",
-            padding: "3rem 2rem",
-            color: "#5a6c7d",
-            fontSize: "1.1rem",
-            fontStyle: "italic",
-            background: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
-            borderRadius: "16px",
-            marginTop: "1.5rem",
-            boxShadow: "0 6px 20px rgba(252, 182, 159, 0.3)",
-            border: "2px solid rgba(255, 255, 255, 0.8)",
-            position: "relative",
-            overflow: "hidden",
+            width: "100%",
+            height: "100%",
+            borderRadius: "13px", /* На 3px меньше чем родитель из-за border */
           }}
-        >
+        />
+        
+        {/* Placeholder для пустого состояния */}
+        {activeTasksCount === 0 && (
           <div
             style={{
               position: "absolute",
-              top: "10px",
-              right: "10px",
-              fontSize: "2rem",
-              opacity: "0.3",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              padding: "3rem 2rem",
+              color: "#5a6c7d",
+              fontSize: "1.1rem",
+              fontStyle: "italic",
+              background: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+              borderRadius: "13px", /* Соответствует радиусу карты */
+              boxShadow: "0 6px 20px rgba(252, 182, 159, 0.3)",
+              border: "2px solid rgba(255, 255, 255, 0.8)",
+              backdropFilter: "blur(10px)",
             }}
           >
-            📍
+            <div
+              style={{
+                fontSize: "3rem",
+                marginBottom: "1rem",
+                opacity: 0.7,
+              }}
+            >
+              🗺️
+            </div>
+            Нет активных задач с координатами для отображения на карте
+            <div
+              style={{
+                fontSize: "0.9rem",
+                opacity: 0.6,
+                marginTop: "0.5rem",
+              }}
+            >
+              Добавьте задачи с координатами, чтобы увидеть их на карте
+            </div>
           </div>
-          Нет активных задач с координатами для отображения на карте
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

@@ -1,7 +1,6 @@
 package database
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 
@@ -23,23 +22,6 @@ type SourcesStorage interface {
 	GetSourcesByid(id int) (models.Sources, error)
 	DeleteSources(id int) models.Sources
 	UpdateSources(id int, Sources models.Sources) error
-	UpdateSourcesPriority(id int, Sources models.Sources) error
-}
-
-func (d *DB) UpdateSourcesPriority(id int, Sources models.Sources) error {
-	const op = "database.UpdateSourcesPriority"
-	err := fmt.Sprintf("no rows detected on %s", op)
-	result := d.pool.Model(&models.Sources{}).Where("ID = ?", id).Updates(Sources)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	if result.RowsAffected == 0 {
-		return errors.New(err)
-	}
-
-	return nil
 }
 
 type DB struct {
