@@ -4,36 +4,9 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
   const mapContainer = useRef(null);
   const mapInstance = useRef(null);
   const currentMarkers = useRef([]);
-  const originalCoords = useRef(new Map());
-  const originalCoordsTo = useRef(new Map());
-
-  // Ключ для localStorage
-  const STORAGE_KEY = "map_tasks_data";
-
-  // Сохранение задач в localStorage
-  const saveTasksToStorage = (tasksData) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasksData));
-    } catch (error) {
-      console.warn("Не удалось сохранить задачи в localStorage:", error);
-    }
-  };
-
-  // Загрузка задач из localStorage
-  const loadTasksFromStorage = () => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch (error) {
-      console.warn("Не удалось загрузить задачи из localStorage:", error);
-      return [];
-    }
-  };
-
-  // Получение всех задач (из пропсов или localStorage)
-  const getAllTasks = () => {
-    return tasks.length > 0 ? tasks : loadTasksFromStorage();
-  };
+  
+  // Хранит цвет маркера для каждого задания
+  const taskColorMap = useRef(new Map());
 
   const getMarkerIcon = () => {
     const icons = [
@@ -56,48 +29,27 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
-  // Хранит цвет маркера для каждого задания
-  const taskColorMap = useRef(new Map());
-
   const handleSave = (task, newCoords) => {
-    const updatedTask = { ...task, x_from: newCoords[0], y_from: newCoords[1] };
+    const updatedTask = { x_from: newCoords[0], y_from: newCoords[1] };
     onTaskUpdate(task.ID, updatedTask);
-    originalCoords.current.delete(task.ID);
-
-    // Сохраняем обновленные задачи в localStorage
-    const allTasks = getAllTasks();
-    const updatedTasks = allTasks.map((t) =>
-      t.ID === task.ID ? updatedTask : t,
-    );
-    saveTasksToStorage(updatedTasks);
   };
 
   const handleSaveTo = (task, newCoords) => {
-    const updatedTask = { ...task, x_to: newCoords[0], y_to: newCoords[1] };
+    const updatedTask = { x_to: newCoords[0], y_to: newCoords[1] };
     onTaskUpdate(task.ID, updatedTask);
-    originalCoordsTo.current.delete(task.ID);
-
-    // Сохраняем обновленные задачи в localStorage
-    const allTasks = getAllTasks();
-    const updatedTasks = allTasks.map((t) =>
-      t.ID === task.ID ? updatedTask : t,
-    );
-    saveTasksToStorage(updatedTasks);
   };
 
   const handleCancel = (task, marker) => {
-    const original = originalCoords.current.get(task.ID);
-    if (original) {
-      marker.geometry.setCoordinates(original);
-      originalCoords.current.delete(task.ID);
+    // Восстанавливаем исходные координаты из пропсов
+    if (task.x_from && task.y_from) {
+      marker.geometry.setCoordinates([task.x_from, task.y_from]);
     }
   };
 
   const handleCancelTo = (task, marker) => {
-    const original = originalCoordsTo.current.get(task.ID);
-    if (original) {
-      marker.geometry.setCoordinates(original);
-      originalCoordsTo.current.delete(task.ID);
+    // Восстанавливаем исходные координаты из пропсов
+    if (task.x_to && task.y_to) {
+      marker.geometry.setCoordinates([task.x_to, task.y_to]);
     }
   };
 
@@ -109,9 +61,8 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
     });
     currentMarkers.current = [];
 
-    // Получаем все активные задачи
-    const allTasks = getAllTasks();
-    const activeTasks = allTasks.filter(
+    // Используем задачи напрямую из пропсов
+    const activeTasks = tasks.filter(
       (task) => task.x_from && task.y_from && task.x_to && task.y_to
     );
 
@@ -176,7 +127,6 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
       );
 
       marker.events.add("dragstart", function () {
-        originalCoords.current.set(task.ID, marker.geometry.getCoordinates());
         marker.options.set("preset", "islands#blueIcon");
         marker.options.set("iconColor", "#1e90ff");
       });
@@ -267,7 +217,6 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
         },
       );
       markerTo.events.add("dragstart", function () {
-        originalCoordsTo.current.set(task.ID, markerTo.geometry.getCoordinates());
         markerTo.options.set("preset", "islands#blueIcon");
         markerTo.options.set("iconColor", "#1e90ff");
       });
@@ -318,7 +267,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
     });
   };
 
-  // Инициализация карты и загрузка данных
+  // Инициализация карты
    useEffect(() => {
     const loadMaps = () => {
       try {
@@ -362,12 +311,6 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
           // Передаем ссылку на карту в родительский компонент
           if (onMapReady) {
             onMapReady(mapInstance.current);
-          }
-
-          // Загружаем задачи из localStorage и обновляем маркеры
-          const savedTasks = loadTasksFromStorage();
-          if (savedTasks.length > 0) {
-            refreshMarkers();
           }
 
           // Добавляем обработчик изменения размера контейнера
@@ -426,11 +369,9 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
     };
   }, []); // eslint-disable-line
 
-  // Обновление маркеров при изменении задач и сохранение в localStorage
+  // Обновление маркеров при изменении задач
   useEffect(() => {
     if (mapInstance.current && window.ymaps) {
-      // Сохраняем задачи в localStorage при любом изменении
-      saveTasksToStorage(tasks);
       refreshMarkers();
     }
   }, [tasks]); // eslint-disable-line
@@ -442,8 +383,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
     } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapInstance.current, window.ymaps]);
 
-  const allTasks = getAllTasks();
-  const activeTasksCount = allTasks.filter(
+  const activeTasksCount = tasks.filter(
     (task) => task.x_from && task.y_from 
   ).length;
 

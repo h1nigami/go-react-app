@@ -91,8 +91,11 @@ func UpdateSources(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	} else {
-		storage.UpdateSources(id, Sources)
-		c.JSON(http.StatusOK, Sources)
+		src, err := storage.UpdateSources(id, Sources)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, src)
 	}
 
 }

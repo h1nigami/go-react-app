@@ -21,7 +21,7 @@ type SourcesStorage interface {
 	GetSourcess() ([]models.Sources, error)
 	GetSourcesByid(id int) (models.Sources, error)
 	DeleteSources(id int) models.Sources
-	UpdateSources(id int, Sources models.Sources) error
+	UpdateSources(id int, Sources models.Sources) (*models.Sources, error)
 }
 
 type DB struct {
@@ -69,18 +69,24 @@ func (d *DB) DeleteSources(id int) models.Sources {
 	return Sources
 }
 
-func (d *DB) UpdateSources(id int, Sources models.Sources) error {
+func (d *DB) UpdateSources(id int, Sources models.Sources) (*models.Sources, error) {
+
 	result := d.pool.Model(&models.Sources{}).Where("ID = ?", id).Updates(Sources)
 
 	if result.Error != nil {
-		return result.Error
+		return nil, result.Error
 	}
 
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("Sources with ID %d not found", id)
+		return nil, fmt.Errorf("Sources with ID %d not found", id)
 	}
 
-	return nil
+	src, err := d.GetSourcesByid(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &src, nil
 }
 
 var cfg *config.Config = config.MustLoad()
