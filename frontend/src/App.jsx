@@ -191,7 +191,6 @@ function App() {
               }}
               placeholder="+7 (999) 123-45-67"
             />
-<<<<<<< HEAD
             <h1>От</h1>
             <input
               value={address.from.country}
@@ -287,16 +286,10 @@ function App() {
               style={{ padding: "0.5rem", width: "80%" }}
             />
 
-=======
->>>>>>> 5a227fa (заявки)
             <button type="submit" className="button">
               Добавить
             </button>
           </form>
-<<<<<<< HEAD
-=======
-
->>>>>>> 5a227fa (заявки)
           <ul>
             <AnimatePresence>
               {tasks.map((t) => (
@@ -405,11 +398,7 @@ function App() {
           <OrderComponent></OrderComponent>
 
         <div className="map-contaiter">
-<<<<<<< HEAD
-          <MapComponent tasks={tasks} onTaskUpdate={updateTask} onMapReady={setMapRef}></MapComponent>
-=======
           <MapComponent tasks={tasks} onTaskUpdate={updatesource} onMapReady={setMapRef} onChange={fetchTasks}></MapComponent>
->>>>>>> 5a227fa (заявки)
         </div>
       </div>
     </div>

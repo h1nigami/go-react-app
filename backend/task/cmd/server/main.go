@@ -50,26 +50,11 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-<<<<<<< HEAD
-<<<<<<< HEAD
 	r.GET("/task", handlers.AllSources)
 	r.GET("/task/:id", handlers.GetSourcesById)
 	r.POST("/task", handlers.CreateSources)
 	r.DELETE("/task/:id", handlers.DeleteSources)
 	r.PATCH("/task/:id", handlers.UpdateSources)
-=======
-	//Источники
-=======
->>>>>>> 5a227fa (заявки)
-	r.GET("/source", handlers.AllSources)
-	r.GET("/source/:id", handlers.GetSourcesById)
-	r.POST("/source", handlers.CreateSources)
-	r.DELETE("/source/:id", handlers.DeleteSources)
-	r.PATCH("/source/:id", handlers.UpdateSources)
-<<<<<<< HEAD
->>>>>>> a56bb84 (orders api)
-=======
->>>>>>> 5a227fa (заявки)
 	r.GET("/cities", handlers.Cities)
 	r.GET("/geocode/:addres", handlers.GeoCode)
 	//Заявки
