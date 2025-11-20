@@ -6,6 +6,7 @@ import (
 
 type Sources struct {
 	gorm.Model
+<<<<<<< HEAD
 	Email         string  `json:"email" validate:"required,email"`       //добавить валидацию
 	Phone_Number  string  `json:"phonenumber" validate:"required",e164"` //добавить валидацию
 	Title         string  `json:"title"`
@@ -16,6 +17,12 @@ type Sources struct {
 	Addres        `json:"addres"`
 	ScheduleInput `json:"schedule"` //переделать под график работы
 	UserID        int               `json:"user_id"` // Внешний ключ
+=======
+	Email         string `json:"email" validate:"required,email"`
+	Phone_Number  string `json:"phonenumber" validate:"required",e164"`
+	Title         string `json:"title"`
+	ScheduleInput `json:"schedule"`
+>>>>>>> 5a227fa (заявки)
 }
 
 type ScheduleInput struct {
@@ -45,4 +52,20 @@ type To struct {
 	CountryTo  string `json:"country"`
 	DistrictTo string `json:"district"`
 	SubjectTo  string `json:"subject"`
+}
+
+type Order struct {
+	gorm.Model
+	Addres      `json:"addres"`
+	From        `json:"from"`
+	To          `json:"to"`
+	Coordinates `json:"coordinates"`
+	Source_id   int `json:"source_id"`
+}
+
+type Coordinates struct {
+	X_from float32 `json:"x_from"`
+	Y_from float32 `json:"y_from"`
+	X_to   float32 `json:"x_to"`
+	Y_to   float32 `json:"y_to"`
 }

@@ -26,6 +26,7 @@ func SetLogger(l *slog.Logger) {
 
 var validate = validator.New(validator.WithRequiredStructEnabled())
 
+// Источники
 func AllSources(c *gin.Context) {
 	uid, err := c.Cookie("user_id")
 	if err != nil {
@@ -113,7 +114,10 @@ func UpdateSources(c *gin.Context) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 5a227fa (заявки)
 //Заявки
 
 func AllOrders(c *gin.Context) {
@@ -125,6 +129,7 @@ func AllOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, Orders)
 }
 
+<<<<<<< HEAD
 func CreateOrder(c *gin.Context) {
 	id := c.Param("id")
 	srcid, err := strconv.Atoi(id)
@@ -169,6 +174,9 @@ func DeleteOrder(c *gin.Context) {
 
 // pkg
 >>>>>>> a56bb84 (orders api)
+=======
+// pkg
+>>>>>>> 5a227fa (заявки)
 func Cities(c *gin.Context) {
 	c.JSON(http.StatusOK, pkg.GetAllCities())
 }
