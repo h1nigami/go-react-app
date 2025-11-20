@@ -3,9 +3,7 @@ import { useEffect, useState } from "react";
 import {
   createsource,
   deletesource,
-  geoCode,
   getsource,
-  getsourceById,
   updatesource,
 } from "./api/apiTask";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,32 +12,15 @@ import MapComponent from "./components/map";
 import WorkScheduleSelect from "./components/scheduleComponent";
 import scheduleDays from "./scripts/schedulePrintScript";
 import OrderComponent from "./components/orderComponent";
+import { getOrders } from "./api/apiOrders";
 
 function App() {
+  const [openOrderSet, SetopenOrderSet] = useState(false);
+  const [orders, setOrders] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
   const [schedule, setSchedule] = useState(null);
-  // eslint-disable-next-line
-  const [coordinates, setCoordinates] = useState({
-    x_from: "",
-    y_from: "",
-    x_to: "",
-    y_to: "",
-  });
-  const [address, setAddress] = useState({
-    from: {
-      street: "",
-      city: "",
-      country: "",
-      number: "",
-    },
-    to: {
-      street: "",
-      city: "",
-      country: "",
-      number: "",
-    },
-  });
+  
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [mapRef, setMapRef] = useState(null);
@@ -48,6 +29,7 @@ function App() {
     getsource()
       .then(setTasks)
       .catch((err) => console.error(err));
+    fetchOrders();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -70,21 +52,6 @@ function App() {
     } finally {
       setNewTask("");
       setSchedule(null);
-      setCoordinates({ x_from: "", y_from: "", x_to: "", y_to: "" });
-      setAddress({
-        from: {
-          street: "",
-          city: "",
-          country: "",
-          number: "",
-        },
-        to: {
-          street: "",
-          city: "",
-          country: "",
-          number: "",
-        },
-      });
       setEmail("");
       setPhoneNumber("");
     }
@@ -98,6 +65,11 @@ function App() {
   const fetchTasks = async () => {
     const tasksfromserver = await getsource();
     setTimeout(setTasks(tasksfromserver), 10)
+  };
+
+  const fetchOrders = async () => {
+    const ordersFromserver = await getOrders();
+    setOrders(ordersFromserver);
   };
 
   // Функция для зума к координатам
@@ -204,8 +176,11 @@ function App() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: 100 }}
                   transition={{ duration: 0.3 }}
+                  
                 >
-                  <div className="contact-info">
+                  
+                  <div className="contact-info" >
+                    
                     <h3 className="contact-title">{t.title}</h3>
 
                     {/*t.x_to && t.y_to && t.y_from && t.x_from  && (
@@ -233,16 +208,6 @@ function App() {
                       </div>
                     )*/}
 
-                    {t.addres && (
-                      <div className="contact-item">
-                        <span className="contact-icon">🏠</span>
-                        <span className="contact-label">Адрес:</span>
-                        <span className="contact-value">
-                          От: {t.addres.from.street + " " + t.addres.from.number + " "} 
-                          До:  {t.addres.to.street + " " + t.addres.to.number}
-                        </span>
-                      </div>
-                    )}
 
                     {t.email && (
                       <div className="contact-item">
@@ -299,10 +264,15 @@ function App() {
 
         </div>  
 
-          <OrderComponent></OrderComponent>
+            
+            <OrderComponent 
+              orders={orders} 
+              onOrderCreate={fetchOrders}
+              tasks={tasks}
+            ></OrderComponent>
 
         <div className="map-contaiter">
-          <MapComponent tasks={tasks} onTaskUpdate={updatesource} onMapReady={setMapRef} onChange={fetchTasks}></MapComponent>
+          <MapComponent orders={orders} onTaskUpdate={updatesource} onMapReady={setMapRef} onChange={fetchOrders}></MapComponent>
         </div>
       </div>
     </div>
