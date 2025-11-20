@@ -112,6 +112,48 @@ func AllOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, Orders)
 }
 
+func CreateOrder(c *gin.Context) {
+	id := c.Param("id")
+	srcid, err := strconv.Atoi(id)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+		return
+	}
+	src, err := storage.GetSourcesByid(srcid)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+	var order models.Order
+	if err := c.BindJSON(&order); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+	storage.CreateOrder(int(src.ID), order)
+}
+
+func OrderById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+	Order, err := storage.GetOrdersByid(id)
+	if err != nil {
+		c.AbortWithError(http.StatusNotFound, err)
+	}
+	c.JSON(http.StatusOK, Order)
+}
+
+func DeleteOrder(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+	if err := storage.DeleteOrder(id); err != nil {
+		c.AbortWithError(http.StatusNotFound, err)
+	}
+	c.JSON(http.StatusOK, gin.H{"deleted": true})
+}
+
 // pkg
 func Cities(c *gin.Context) {
 	c.JSON(http.StatusOK, pkg.GetAllCities())
