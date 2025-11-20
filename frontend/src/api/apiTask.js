@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8081";
+export const API_URL = "http://localhost:8081";
 
 export async function getTask() {
   const response = await fetch(`${API_URL}/task`, {

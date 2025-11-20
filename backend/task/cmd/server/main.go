@@ -50,13 +50,27 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+<<<<<<< HEAD
 	r.GET("/task", handlers.AllSources)
 	r.GET("/task/:id", handlers.GetSourcesById)
 	r.POST("/task", handlers.CreateSources)
 	r.DELETE("/task/:id", handlers.DeleteSources)
 	r.PATCH("/task/:id", handlers.UpdateSources)
+=======
+	//Источники
+	r.GET("/source", handlers.AllSources)
+	r.GET("/source/:id", handlers.GetSourcesById)
+	r.POST("/source", handlers.CreateSources)
+	r.DELETE("/source/:id", handlers.DeleteSources)
+	r.PATCH("/source/:id", handlers.UpdateSources)
+>>>>>>> a56bb84 (orders api)
 	r.GET("/cities", handlers.Cities)
 	r.GET("/geocode/:addres", handlers.GeoCode)
+	//Заявки
+	r.GET("/orders", handlers.AllOrders)
+	r.GET("orders/:id", handlers.OrderById)
+	r.POST("/orders/:id", handlers.CreateOrder)
+	r.DELETE("/orders/:id", handlers.DeleteOrder)
 
 	srv := &http.Server{
 		Addr:         cfg.Addres,
