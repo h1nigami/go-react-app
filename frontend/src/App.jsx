@@ -170,6 +170,7 @@ function App() {
               onChange={(e) => setNewTask(e.target.value)}
               placeholder="Наименование"
               style={{ padding: "0.5rem", width: "80%" }}
+              required
             />
             <WorkScheduleSelect value={schedule} onChange={setSchedule} />
             {/* 
@@ -199,6 +200,7 @@ function App() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
+              required
             />
             <input
               value={phoneNumber}
@@ -213,6 +215,7 @@ function App() {
                 setPhoneNumber(formated);
               }}
               placeholder="+7 (999) 123-45-67"
+              required
             />
             <h1>От</h1>
             <input
@@ -225,6 +228,7 @@ function App() {
               }
               placeholder="Страна"
               style={{ padding: "0.5rem", width: "80%" }}
+              required
             />
             <input
               list="cities"
@@ -237,6 +241,7 @@ function App() {
               }
               placeholder="Город"
               style={{ padding: "0.5rem", width: "80%" }}
+              required
             />
 
             <input
@@ -249,6 +254,7 @@ function App() {
               }
               placeholder="Улица"
               style={{ padding: "0.5rem", width: "80%" }}
+              required
             />
             <input
               value={address.from.number}
@@ -260,6 +266,7 @@ function App() {
               }
               placeholder="Номер дома"
               style={{ padding: "0.5rem", width: "80%" }}
+              required
             />
             <h1>До</h1>
             <input
@@ -272,6 +279,7 @@ function App() {
               }
               placeholder="Страна"
               style={{ padding: "0.5rem", width: "80%" }}
+              required
             />
             <input
               list="cities"
@@ -284,6 +292,7 @@ function App() {
               }
               placeholder="Город"
               style={{ padding: "0.5rem", width: "80%" }}
+              required
             />
 
             <input
@@ -296,6 +305,7 @@ function App() {
               }
               placeholder="Улица"
               style={{ padding: "0.5rem", width: "80%" }}
+              required
             />
             <input
               value={address.to.number}
@@ -307,6 +317,7 @@ function App() {
               }
               placeholder="Номер дома"
               style={{ padding: "0.5rem", width: "80%" }}
+              required
             />
 
             <button type="submit" className="button">
@@ -420,7 +431,7 @@ function App() {
           </ul>
         </div>
         <div className="map-contaiter">
-          <MapComponent tasks={tasks} onTaskUpdate={updateTask} onMapReady={setMapRef}></MapComponent>
+          <MapComponent tasks={tasks} onTaskUpdate={updateTask} onMapReady={setMapRef} onChange={fetchTasks}></MapComponent>
         </div>
       </div>
     </div>

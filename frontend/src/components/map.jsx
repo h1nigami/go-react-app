@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
+const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady, onChange }) => {
   const mapContainer = useRef(null);
   const mapInstance = useRef(null);
   const currentMarkers = useRef([]);
@@ -32,11 +32,13 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady }) => {
   const handleSave = (task, newCoords) => {
     const updatedTask = { x_from: newCoords[0], y_from: newCoords[1] };
     onTaskUpdate(task.ID, updatedTask);
+    onChange();
   };
 
   const handleSaveTo = (task, newCoords) => {
     const updatedTask = { x_to: newCoords[0], y_to: newCoords[1] };
     onTaskUpdate(task.ID, updatedTask);
+    onChange();
   };
 
   const handleCancel = (task, marker) => {
