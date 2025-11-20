@@ -54,6 +54,9 @@ export async function cities() {
 }
 
 export async function geoCode(addres) {
+  if ("/" in addres) {
+    addres = addres.replace("/", ".")
+  }
   const responce = await fetch(`${API_URL}/geocode/${addres}`);
   if (!responce.ok) throw new Error("failed to fetch geoCode");
   return responce.json();
