@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "../styles/EditDropdown.css";
-import { updateTask } from "../api/apiTask";
+import { updatesource } from "../api/apiTask";
 
 function EditTitleMenu({ task, open, setOpen, onEdit }) {
   const menuRef = useRef();
@@ -19,7 +19,7 @@ function EditTitleMenu({ task, open, setOpen, onEdit }) {
 
   const handleUpdate = async () => {
     try {
-      await updateTask(task.ID, { title: newTask });
+      await updatesource(task.ID, { title: newTask });
       setOpen(false);
       onEdit(task);
       setNewTask("");

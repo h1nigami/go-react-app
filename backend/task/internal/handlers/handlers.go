@@ -26,6 +26,7 @@ func SetLogger(l *slog.Logger) {
 
 var validate = validator.New(validator.WithRequiredStructEnabled())
 
+// Источники
 func AllSources(c *gin.Context) {
 	Sourcess, err := storage.GetSourcess()
 	if err != nil {
@@ -100,6 +101,18 @@ func UpdateSources(c *gin.Context) {
 
 }
 
+//Заявки
+
+func AllOrders(c *gin.Context) {
+	Orders, err := storage.GetOrders()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err})
+		return
+	}
+	c.JSON(http.StatusOK, Orders)
+}
+
+// pkg
 func Cities(c *gin.Context) {
 	c.JSON(http.StatusOK, pkg.GetAllCities())
 }

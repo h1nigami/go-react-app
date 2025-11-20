@@ -1,17 +1,19 @@
 import "./styles/App.css";
 import { useEffect, useState } from "react";
 import {
-  createTask,
-  deleteTask,
+  createsource,
+  deletesource,
   geoCode,
-  getTask,
-  updateTask,
+  getsource,
+  getsourceById,
+  updatesource,
 } from "./api/apiTask";
 import { motion, AnimatePresence } from "framer-motion";
 import EditDropdown from "./components/editDropDown";
 import MapComponent from "./components/map";
 import WorkScheduleSelect from "./components/scheduleComponent";
 import scheduleDays from "./scripts/schedulePrintScript";
+import OrderComponent from "./components/orderComponent";
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -43,7 +45,7 @@ function App() {
   const [mapRef, setMapRef] = useState(null);
 
   useEffect(() => {
-    getTask()
+    getsource()
       .then(setTasks)
       .catch((err) => console.error(err));
   }, []);
@@ -52,42 +54,12 @@ function App() {
     e.preventDefault();
     if (!newTask.trim()) return;
     try {
-      const coordsFrom = await geoCode(
-        `${address.from.country} ${address.from.city} ${address.from.street} ${address.from.number}`,
-      );
-      const coordsTo = await geoCode(
-        `${address.to.country} ${address.to.city} ${address.to.street} ${address.to.number}`,
-      );
-      setCoordinates({
-        x_to: coordsTo.x,
-        y_to: coordsTo.y,
-        x_from: coordsFrom.x,
-        y_from: coordsFrom.y,
-      });
-      const created = await createTask({
+      const created = await createsource({
         title: newTask,
         schedule: {
           days: schedule.days.join(","),
           start: schedule.start,
           end: schedule.end,
-        },
-        x_from: coordsFrom.x ? parseFloat(coordsFrom.x) : null,
-        y_from: coordsFrom.y ? parseFloat(coordsFrom.y) : null,
-        x_to: coordsTo.x ? parseFloat(coordsTo.x) : null,
-        y_to: coordsTo.y ? parseFloat(coordsTo.y) : null,
-        addres: {
-          from: {
-            street: address.from.street,
-            city: address.from.city,
-            country: address.from.country,
-            number: address.from.number,
-          },
-          to: {
-            street: address.to.street,
-            city: address.to.city,
-            country: address.to.country,
-            number: address.to.number,
-          },
         },
         email: email,
         phoneNumber: phoneNumber,
@@ -118,14 +90,14 @@ function App() {
     }
   };
 
-  const deletetask = async (id) => {
-    await deleteTask(id);
+  const deleteSource = async (id) => {
+    await deletesource(id);
     setTasks((prev) => prev.filter((task) => task.ID !== id));
   };
 
   const fetchTasks = async () => {
-    const tasksfromserver = await getTask();
-    setTasks(tasksfromserver);
+    const tasksfromserver = await getsource();
+    setTimeout(setTasks(tasksfromserver), 10)
   };
 
   // Функция для зума к координатам
@@ -217,116 +189,11 @@ function App() {
               placeholder="+7 (999) 123-45-67"
               required
             />
-            <h1>От</h1>
-            <input
-              value={address.from.country}
-              onChange={(e) =>
-                setAddress((prev) => ({
-                  ...prev,
-                  from: { ...prev.from, country: e.target.value },
-                }))
-              }
-              placeholder="Страна"
-              style={{ padding: "0.5rem", width: "80%" }}
-              required
-            />
-            <input
-              list="cities"
-              value={address.from.city}
-              onChange={(e) =>
-                setAddress((prev) => ({
-                  ...prev,
-                  from: { ...prev.from, city: e.target.value },
-                }))
-              }
-              placeholder="Город"
-              style={{ padding: "0.5rem", width: "80%" }}
-              required
-            />
-
-            <input
-              value={address.from.street}
-              onChange={(e) =>
-                setAddress((prev) => ({
-                  ...prev,
-                  from: { ...prev.from, street: e.target.value },
-                }))
-              }
-              placeholder="Улица"
-              style={{ padding: "0.5rem", width: "80%" }}
-              required
-            />
-            <input
-              value={address.from.number}
-              onChange={(e) =>
-                setAddress((prev) => ({
-                  ...prev,
-                  from: { ...prev.from, number: e.target.value },
-                }))
-              }
-              placeholder="Номер дома"
-              style={{ padding: "0.5rem", width: "80%" }}
-              required
-            />
-            <h1>До</h1>
-            <input
-              value={address.to.country}
-              onChange={(e) =>
-                setAddress((prev) => ({
-                  ...prev,
-                  to: { ...prev.to, country: e.target.value },
-                }))
-              }
-              placeholder="Страна"
-              style={{ padding: "0.5rem", width: "80%" }}
-              required
-            />
-            <input
-              list="cities"
-              value={address.to.city}
-              onChange={(e) =>
-                setAddress((prev) => ({
-                  ...prev,
-                  to: { ...prev.to, city: e.target.value },
-                }))
-              }
-              placeholder="Город"
-              style={{ padding: "0.5rem", width: "80%" }}
-              required
-            />
-
-            <input
-              value={address.to.street}
-              onChange={(e) =>
-                setAddress((prev) => ({
-                  ...prev,
-                  to: { ...prev.to, street: e.target.value },
-                }))
-              }
-              placeholder="Улица"
-              style={{ padding: "0.5rem", width: "80%" }}
-              required
-            />
-            <input
-              value={address.to.number}
-              onChange={(e) =>
-                setAddress((prev) => ({
-                  ...prev,
-                  to: { ...prev.to, number: e.target.value },
-                }))
-              }
-              placeholder="Номер дома"
-              style={{ padding: "0.5rem", width: "80%" }}
-              required
-            />
-
             <button type="submit" className="button">
               Добавить
             </button>
           </form>
-          
-        </div>
-        <div className="todo-card-result">
+
           <ul>
             <AnimatePresence>
               {tasks.map((t) => (
@@ -341,7 +208,7 @@ function App() {
                   <div className="contact-info">
                     <h3 className="contact-title">{t.title}</h3>
 
-                    {t.x_to && t.y_to && t.y_from && t.x_from  && (
+                    {/*t.x_to && t.y_to && t.y_from && t.x_from  && (
                       <div className="contact-item">
                         <span className="contact-icon">📍</span>
                         <span className="contact-label">Координаты:</span>
@@ -364,7 +231,7 @@ function App() {
                           </span>
                         </div>
                       </div>
-                    )}
+                    )*/}
 
                     {t.addres && (
                       <div className="contact-item">
@@ -413,7 +280,7 @@ function App() {
                   </div>
                   <div className="task-buttons">
                     <button
-                      onClick={() => deletetask(t.ID)}
+                      onClick={() => deleteSource(t.ID)}
                       className="button"
                       type="submit"
                     >
@@ -422,16 +289,20 @@ function App() {
                     <EditDropdown
                       task={t}
                       onEdit={fetchTasks}
-                      onDelete={(task) => deletetask(task)}
+                      onDelete={(task) => deleteSource(task)}
                     />
                   </div>
                 </motion.li>
               ))}
             </AnimatePresence>
           </ul>
-        </div>
+
+        </div>  
+
+          <OrderComponent></OrderComponent>
+
         <div className="map-contaiter">
-          <MapComponent tasks={tasks} onTaskUpdate={updateTask} onMapReady={setMapRef} onChange={fetchTasks}></MapComponent>
+          <MapComponent tasks={tasks} onTaskUpdate={updatesource} onMapReady={setMapRef} onChange={fetchTasks}></MapComponent>
         </div>
       </div>
     </div>

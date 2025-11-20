@@ -22,6 +22,11 @@ type SourcesStorage interface {
 	GetSourcesByid(id int) (models.Sources, error)
 	DeleteSources(id int) models.Sources
 	UpdateSources(id int, Sources models.Sources) (*models.Sources, error)
+	CreateOrder(id int, order models.Order)
+	GetOrders() ([]models.Order, error)
+	GetOrdersByid(id int) (*models.Order, error)
+	DeleteOrder(id int) error
+	UpdateOrder(id int, order models.Order) error
 }
 
 type DB struct {
@@ -42,8 +47,10 @@ func NewSqliteConnection(db_name string) (*DB, error) {
 
 func (d *DB) createTables() {
 	d.pool.AutoMigrate(&models.Sources{})
+	d.pool.AutoMigrate(&models.Order{})
 }
 
+// Источники
 func (d *DB) GetSourcess() ([]models.Sources, error) {
 	var Sourcess []models.Sources
 	result := d.pool.Find(&Sourcess)
@@ -78,7 +85,7 @@ func (d *DB) UpdateSources(id int, Sources models.Sources) (*models.Sources, err
 	}
 
 	if result.RowsAffected == 0 {
-		return nil, fmt.Errorf("Sources with ID %d not found", id)
+		return nil, fmt.Errorf("sources with ID %d not found", id)
 	}
 
 	src, err := d.GetSourcesByid(id)
@@ -87,6 +94,47 @@ func (d *DB) UpdateSources(id int, Sources models.Sources) (*models.Sources, err
 	}
 
 	return &src, nil
+}
+
+// Заявки
+func (d *DB) CreateOrder(id int, order models.Order) {
+	order.Source_id = id
+	d.pool.Create(&order)
+}
+
+func (d *DB) GetOrders() ([]models.Order, error) {
+	var Orders []models.Order
+	result := d.pool.Find(&Orders)
+	return Orders, result.Error
+}
+
+func (d *DB) GetOrdersByid(id int) (*models.Order, error) {
+	var Order models.Order
+	result := d.pool.Where("ID = ?", id).Find(&Order)
+	if result.RowsAffected == 0 {
+		return nil, fmt.Errorf("не удалось найти ордер с ID %v", id)
+	}
+	return &Order, nil
+}
+
+func (d *DB) DeleteOrder(id int) error {
+	Order, err := d.GetOrdersByid(id)
+	if err != nil {
+		return err
+	}
+	d.pool.Delete(&Order)
+	return nil
+}
+
+func (d *DB) UpdateOrder(id int, order models.Order) error {
+	result := d.pool.Model(&models.Order{}).Where("ID = ?", id).Updates(order)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("не удалось найти ордер с ID %v", id)
+	}
+	return nil
 }
 
 var cfg *config.Config = config.MustLoad()

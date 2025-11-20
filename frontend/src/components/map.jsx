@@ -147,7 +147,7 @@ const MapComponent = ({ tasks = [], onTaskUpdate, onMapReady, onChange }) => {
             const newSaveBtn = document.querySelector(`#save-btn-${task.ID}`);
             newSaveBtn.addEventListener("click", (e) => {
               e.preventDefault();
-              e.stopPropagation();
+                e.stopPropagation();
               handleSave(task, newCoords);
               marker.balloon.close();
             });

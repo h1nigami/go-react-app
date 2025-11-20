@@ -1,50 +1,50 @@
 const API_URL = "http://localhost:8081";
 
-export async function getTask() {
-  const response = await fetch(`${API_URL}/task`, {
+export async function getsource() {
+  const response = await fetch(`${API_URL}/source`, {
     credentials: "include",
     method: "GET",
   });
-  if (!response.ok) throw new Error("failed to fetch task");
+  if (!response.ok) throw new Error("failed to fetch source");
   return response.json();
 }
 
-export async function getTaskById(id) {
-  const response = await fetch(`${API_URL}/task/${id}`);
-  if (!response.ok) throw new Error("failed to fetch task");
+export async function getsourceById(id) {
+  const response = await fetch(`${API_URL}/source/${id}`);
+  if (!response.ok) throw new Error("failed to fetch source");
   return response.json();
 }
 
-export async function createTask(task) {
-  const response = await fetch(`${API_URL}/task`, {
+export async function createsource(source) {
+  const response = await fetch(`${API_URL}/source`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(task),
+    body: JSON.stringify(source),
     credentials: "include",
   });
-  if (!response.ok) throw new Error("failed to create task");
+  if (!response.ok) throw new Error("failed to create source");
   return response.json();
 }
 
-export async function deleteTask(id) {
-  const responce = await fetch(`${API_URL}/task/${id}`, {
+export async function deletesource(id) {
+  const responce = await fetch(`${API_URL}/source/${id}`, {
     method: "DELETE",
     credentials: "include",
   });
-  if (!responce.ok) throw new Error("failed to delete task");
+  if (!responce.ok) throw new Error("failed to delete source");
   return responce.json();
 }
 
-export async function updateTask(id, updatedTask) {
-  const responce = await fetch(`${API_URL}/task/${id}`, {
+export async function updatesource(id, updatedsource) {
+  const responce = await fetch(`${API_URL}/source/${id}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(updatedTask),
+    body: JSON.stringify(updatedsource),
     credentials: "include",
   });
-  if (!responce.ok) throw new Error("failed to update task");
+  if (!responce.ok) throw new Error("failed to update source");
   return responce.json();
 }
 
