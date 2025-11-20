@@ -59,8 +59,15 @@ func GetAllCities() []map[string]any {
 }
 
 func GeoCoder(query string) ([]*model.Address, error) {
+	qeryBytes := []byte(query)
+	for i := 0; i < len(qeryBytes); i++ {
+		if qeryBytes[i] == byte('.') {
+			qeryBytes[i] = byte('/')
+		}
+	}
 	api := dadata.NewCleanApi()
-	result, err := api.Address(context.Background(), query)
+	result, err := api.Address(context.Background(), string(qeryBytes))
+
 	if err != nil {
 		return nil, err
 	}
