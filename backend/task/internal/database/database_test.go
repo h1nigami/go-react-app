@@ -158,3 +158,50 @@ func TestDB_GetSourceById(t *testing.T) {
 		}
 	})
 }
+
+func TestDB_UpdateSources(t *testing.T) {
+	tdb := SetUpTestDB(t)
+	defer tdb.Cleanup(t)
+	t.Run("Успешное обновление источника", func(t *testing.T) {
+		originalSource := &models.Sources{
+			Title:        "Исходное имя",
+			Email:        "test@example.com",
+			Phone_Number: "89999999999",
+		}
+		tdb.db.CreateSources(originalSource)
+		updatedSources := &models.Sources{
+			Title:        "Новое имя",
+			Email:        "test1@example.com",
+			Phone_Number: "89999999999",
+		}
+		result, err := tdb.db.UpdateSources(int(originalSource.ID), *updatedSources)
+		if err != nil {
+			t.Errorf("Ошибка при обновлении источника %v", err)
+		}
+		if result.Title != "Новое имя" {
+			t.Errorf("Ожидалось имя 'Новое имя', получено '%s'", result.Title)
+		}
+		if result.Email != "test1@example.com" {
+			t.Errorf("Ожидалось email 'test1@example.com', получено '%s'", result.Email)
+		}
+		foundSource, err := tdb.db.GetSourcesByid(int(originalSource.ID))
+		if err != nil {
+			t.Errorf("Ошибка при получении источника по ID: %v", err)
+		}
+		if foundSource.Title != "Новое имя" {
+			t.Errorf("Изменения не сохранились в бд не: ожидалось имя 'Новое имя', получено '%s'", foundSource.Title)
+		}
+	})
+	t.Run("Обновление несуществующего источника", func(t *testing.T) {
+		updatedSource := models.Sources{
+			Title: "Несуществующий источник",
+		}
+		_, err := tdb.db.UpdateSources(9999999, updatedSource)
+		if err == nil {
+			t.Errorf("Ожидалась ошибка для при обновлении несуществующего источника")
+		}
+		if err != nil && err.Error() != "sources with ID 9999999 not found" {
+			t.Errorf("Неожиданная ошибка: %v", err)
+		}
+	})
+}
