@@ -137,47 +137,6 @@ func (d *DB) UpdateOrder(id int, order models.Order) error {
 	return nil
 }
 
-// Заявки
-func (d *DB) CreateOrder(id int, order models.Order) {
-	order.Source_id = id
-	d.pool.Create(&order)
-}
-
-func (d *DB) GetOrders() ([]models.Order, error) {
-	var Orders []models.Order
-	result := d.pool.Find(&Orders)
-	return Orders, result.Error
-}
-
-func (d *DB) GetOrdersByid(id int) (*models.Order, error) {
-	var Order models.Order
-	result := d.pool.Where("ID = ?", id).Find(&Order)
-	if result.RowsAffected == 0 {
-		return nil, fmt.Errorf("не удалось найти ордер с ID %v", id)
-	}
-	return &Order, nil
-}
-
-func (d *DB) DeleteOrder(id int) error {
-	Order, err := d.GetOrdersByid(id)
-	if err != nil {
-		return err
-	}
-	d.pool.Delete(&Order)
-	return nil
-}
-
-func (d *DB) UpdateOrder(id int, order models.Order) error {
-	result := d.pool.Model(&models.Order{}).Where("ID = ?", id).Updates(order)
-	if result.Error != nil {
-		return result.Error
-	}
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("не удалось найти ордер с ID %v", id)
-	}
-	return nil
-}
-
 var cfg *config.Config = config.MustLoad()
 var DataBase SourcesStorage
 
