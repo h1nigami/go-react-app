@@ -24,9 +24,26 @@ type HttpServer struct {
 }
 
 func MustLoad() *Config {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("error: %v", err.Error())
+	// Попробуем загрузить .env из разных возможных мест
+	envPaths := []string{
+		".env",              // из корня проекта
+		"backend/task/.env", // относительный путь
+		"../.env",           // на уровень выше
+		"../../.env",        // на два уровня выше
 	}
+
+	var loaded bool
+	for _, path := range envPaths {
+		if err := godotenv.Load(path); err == nil {
+			loaded = true
+			break
+		}
+	}
+
+	if !loaded {
+		log.Printf("warning: .env file not found, using environment variables")
+	}
+
 	CONFIG_PATH := os.Getenv("CONFIG_PATH")
 
 	if CONFIG_PATH == "" {

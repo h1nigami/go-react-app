@@ -30,7 +30,7 @@ type SourcesStorage interface {
 }
 
 type DB struct {
-	pool *gorm.DB
+	Pool *gorm.DB
 }
 
 func NewSqliteConnection(db_name string) (*DB, error) {
@@ -40,31 +40,31 @@ func NewSqliteConnection(db_name string) (*DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ошибка в функции %v: %v", op, err)
 	}
-	data := DB{pool: db}
+	data := DB{Pool: db}
 	data.createTables()
 	return &data, nil
 }
 
 func (d *DB) createTables() {
-	d.pool.AutoMigrate(&models.Sources{})
-	d.pool.AutoMigrate(&models.Order{})
+	d.Pool.AutoMigrate(&models.Sources{})
+	d.Pool.AutoMigrate(&models.Order{})
 }
 
 // Источники
 func (d *DB) GetSourcess() ([]models.Sources, error) {
 	var Sourcess []models.Sources
-	result := d.pool.Find(&Sourcess)
+	result := d.Pool.Find(&Sourcess)
 	return Sourcess, result.Error
 }
 
 func (d *DB) GetSourcesByid(id int) (models.Sources, error) {
 	var Sources models.Sources
-	result := d.pool.Where("ID = ?", id).Find(&Sources)
+	result := d.Pool.Where("ID = ?", id).Find(&Sources)
 	return Sources, result.Error
 }
 
 func (d *DB) CreateSources(Sources *models.Sources) {
-	d.pool.Create(&Sources)
+	d.Pool.Create(&Sources)
 }
 
 func (d *DB) DeleteSources(id int) models.Sources {
@@ -72,13 +72,13 @@ func (d *DB) DeleteSources(id int) models.Sources {
 	if err != nil {
 		log.Error("database error", slog.String("DeleteSources", err.Error()))
 	}
-	d.pool.Delete(&Sources)
+	d.Pool.Delete(&Sources)
 	return Sources
 }
 
 func (d *DB) UpdateSources(id int, Sources models.Sources) (*models.Sources, error) {
 
-	result := d.pool.Model(&models.Sources{}).Where("ID = ?", id).Updates(Sources)
+	result := d.Pool.Model(&models.Sources{}).Where("ID = ?", id).Updates(Sources)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -99,18 +99,18 @@ func (d *DB) UpdateSources(id int, Sources models.Sources) (*models.Sources, err
 // Заявки
 func (d *DB) CreateOrder(id int, order models.Order) {
 	order.Source_id = id
-	d.pool.Create(&order)
+	d.Pool.Create(&order)
 }
 
 func (d *DB) GetOrders() ([]models.Order, error) {
 	var Orders []models.Order
-	result := d.pool.Find(&Orders)
+	result := d.Pool.Find(&Orders)
 	return Orders, result.Error
 }
 
 func (d *DB) GetOrdersByid(id int) (*models.Order, error) {
 	var Order models.Order
-	result := d.pool.Where("ID = ?", id).Find(&Order)
+	result := d.Pool.Where("ID = ?", id).Find(&Order)
 	if result.RowsAffected == 0 {
 		return nil, fmt.Errorf("не удалось найти ордер с ID %v", id)
 	}
@@ -122,12 +122,12 @@ func (d *DB) DeleteOrder(id int) error {
 	if err != nil {
 		return err
 	}
-	d.pool.Delete(&Order)
+	d.Pool.Delete(&Order)
 	return nil
 }
 
 func (d *DB) UpdateOrder(id int, order models.Order) error {
-	result := d.pool.Model(&models.Order{}).Where("ID = ?", id).Updates(order)
+	result := d.Pool.Model(&models.Order{}).Where("ID = ?", id).Updates(order)
 	if result.Error != nil {
 		return result.Error
 	}
