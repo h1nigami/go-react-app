@@ -1,7 +1,6 @@
 package database
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 
@@ -18,37 +17,16 @@ func SetLoger(l *slog.Logger) {
 }
 
 type SourcesStorage interface {
-	CreateSources(Sources *models.Sources, user_id int)
-	GetSourcess(user_id any) ([]models.Sources, error)
+	CreateSources(Sources *models.Sources)
+	GetSourcess() ([]models.Sources, error)
 	GetSourcesByid(id int) (models.Sources, error)
 	DeleteSources(id int) models.Sources
-<<<<<<< HEAD
-	UpdateSources(id int, Sources models.Sources) error
-	UpdateSourcesPriority(id int, Sources models.Sources) error
-}
-
-func (d *DB) UpdateSourcesPriority(id int, Sources models.Sources) error {
-	const op = "database.UpdateSourcesPriority"
-	err := fmt.Sprintf("no rows detected on %s", op)
-	result := d.pool.Model(&models.Sources{}).Where("ID = ?", id).Updates(Sources)
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	if result.RowsAffected == 0 {
-		return errors.New(err)
-	}
-
-	return nil
-=======
 	UpdateSources(id int, Sources models.Sources) (*models.Sources, error)
 	CreateOrder(id int, order models.Order)
 	GetOrders() ([]models.Order, error)
 	GetOrdersByid(id int) (*models.Order, error)
 	DeleteOrder(id int) error
 	UpdateOrder(id int, order models.Order) error
->>>>>>> 5a227fa (заявки)
 }
 
 type DB struct {
@@ -72,14 +50,10 @@ func (d *DB) createTables() {
 	d.pool.AutoMigrate(&models.Order{})
 }
 
-<<<<<<< HEAD
-func (d *DB) GetSourcess(user_id any) ([]models.Sources, error) {
-=======
 // Источники
 func (d *DB) GetSourcess() ([]models.Sources, error) {
->>>>>>> 5a227fa (заявки)
 	var Sourcess []models.Sources
-	result := d.pool.Where("user_id = ?", user_id).Find(&Sourcess)
+	result := d.pool.Find(&Sourcess)
 	return Sourcess, result.Error
 }
 
@@ -89,8 +63,7 @@ func (d *DB) GetSourcesByid(id int) (models.Sources, error) {
 	return Sources, result.Error
 }
 
-func (d *DB) CreateSources(Sources *models.Sources, user_id int) {
-	Sources.UserID = user_id
+func (d *DB) CreateSources(Sources *models.Sources) {
 	d.pool.Create(&Sources)
 }
 
@@ -103,21 +76,64 @@ func (d *DB) DeleteSources(id int) models.Sources {
 	return Sources
 }
 
-func (d *DB) UpdateSources(id int, Sources models.Sources) error {
+func (d *DB) UpdateSources(id int, Sources models.Sources) (*models.Sources, error) {
+
 	result := d.pool.Model(&models.Sources{}).Where("ID = ?", id).Updates(Sources)
 
 	if result.Error != nil {
-		return result.Error
+		return nil, result.Error
 	}
 
 	if result.RowsAffected == 0 {
-<<<<<<< HEAD
-		return fmt.Errorf("Sources with ID %d not found", id)
-=======
 		return nil, fmt.Errorf("sources with ID %d not found", id)
->>>>>>> 5a227fa (заявки)
 	}
 
+	src, err := d.GetSourcesByid(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &src, nil
+}
+
+// Заявки
+func (d *DB) CreateOrder(id int, order models.Order) {
+	order.Source_id = id
+	d.pool.Create(&order)
+}
+
+func (d *DB) GetOrders() ([]models.Order, error) {
+	var Orders []models.Order
+	result := d.pool.Find(&Orders)
+	return Orders, result.Error
+}
+
+func (d *DB) GetOrdersByid(id int) (*models.Order, error) {
+	var Order models.Order
+	result := d.pool.Where("ID = ?", id).Find(&Order)
+	if result.RowsAffected == 0 {
+		return nil, fmt.Errorf("не удалось найти ордер с ID %v", id)
+	}
+	return &Order, nil
+}
+
+func (d *DB) DeleteOrder(id int) error {
+	Order, err := d.GetOrdersByid(id)
+	if err != nil {
+		return err
+	}
+	d.pool.Delete(&Order)
+	return nil
+}
+
+func (d *DB) UpdateOrder(id int, order models.Order) error {
+	result := d.pool.Model(&models.Order{}).Where("ID = ?", id).Updates(order)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("не удалось найти ордер с ID %v", id)
+	}
 	return nil
 }
 

@@ -28,12 +28,7 @@ var validate = validator.New(validator.WithRequiredStructEnabled())
 
 // Источники
 func AllSources(c *gin.Context) {
-	uid, err := c.Cookie("user_id")
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
-	Sourcess, err := storage.GetSourcess(uid)
+	Sourcess, err := storage.GetSourcess()
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": err})
 		return
@@ -56,16 +51,6 @@ func GetSourcesById(c *gin.Context) {
 
 func CreateSources(c *gin.Context) {
 	var Sources models.Sources
-	uidStr, err := c.Cookie("user_id")
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "user id cookie not found"})
-		return
-	}
-	uid, err := strconv.Atoi(uidStr)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid user id"})
-		return
-	}
 	if err := c.BindJSON(&Sources); err != nil {
 		log.Info("Data from frontend", slog.Any("source", Sources))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
@@ -81,7 +66,7 @@ func CreateSources(c *gin.Context) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 			return
 		}
-		storage.CreateSources(&Sources, uid)
+		storage.CreateSources(&Sources)
 		c.JSON(http.StatusCreated, Sources)
 	}
 }
@@ -107,17 +92,15 @@ func UpdateSources(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	} else {
-		storage.UpdateSources(id, Sources)
-		c.JSON(http.StatusOK, Sources)
+		src, err := storage.UpdateSources(id, Sources)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, src)
 	}
 
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 5a227fa (заявки)
 //Заявки
 
 func AllOrders(c *gin.Context) {
@@ -129,7 +112,6 @@ func AllOrders(c *gin.Context) {
 	c.JSON(http.StatusOK, Orders)
 }
 
-<<<<<<< HEAD
 func CreateOrder(c *gin.Context) {
 	id := c.Param("id")
 	srcid, err := strconv.Atoi(id)
@@ -173,10 +155,6 @@ func DeleteOrder(c *gin.Context) {
 }
 
 // pkg
->>>>>>> a56bb84 (orders api)
-=======
-// pkg
->>>>>>> 5a227fa (заявки)
 func Cities(c *gin.Context) {
 	c.JSON(http.StatusOK, pkg.GetAllCities())
 }
@@ -185,6 +163,7 @@ func GeoCode(c *gin.Context) {
 	addres, err := pkg.GeoCoder(c.Param("addres"))
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"x": 1, "y": 1})
+		return
 	}
 	coords := map[string]any{
 		"x": addres[0].GeoLat,

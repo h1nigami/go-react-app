@@ -6,23 +6,10 @@ import (
 
 type Sources struct {
 	gorm.Model
-<<<<<<< HEAD
-	Email         string  `json:"email" validate:"required,email"`       //добавить валидацию
-	Phone_Number  string  `json:"phonenumber" validate:"required",e164"` //добавить валидацию
-	Title         string  `json:"title"`
-	Xfrom         float32 `json:"x_from"`
-	Yfrom         float32 `json:"y_from"`
-	Xto           float32 `json:"x_to"`
-	Yto           float32 `json:"y_to"`
-	Addres        `json:"addres"`
-	ScheduleInput `json:"schedule"` //переделать под график работы
-	UserID        int               `json:"user_id"` // Внешний ключ
-=======
 	Email         string `json:"email" validate:"required,email"`
 	Phone_Number  string `json:"phonenumber" validate:"required",e164"`
 	Title         string `json:"title"`
 	ScheduleInput `json:"schedule"`
->>>>>>> 5a227fa (заявки)
 }
 
 type ScheduleInput struct {

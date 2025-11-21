@@ -46,9 +46,6 @@ export default function WorkScheduleSelect({
     };
     onChange(schedule);
     setOpen(false);
-    setDays([]);
-    setStart("");
-    setEnd("");
   };
 
   const clear = (e) => {

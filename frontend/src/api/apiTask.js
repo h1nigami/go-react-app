@@ -20,7 +20,6 @@ export async function createsource(source) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(source),
-    credentials: "include",
   });
   if (!response.ok) throw new Error("failed to create source");
   return response.json();
