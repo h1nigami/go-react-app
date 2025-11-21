@@ -69,3 +69,58 @@ func TestDB_CreateSources(t *testing.T) {
 	}
 
 }
+
+func TestDB_GetSouces(t *testing.T) {
+	tdb := SetUpTestDB(t)
+	defer tdb.Cleanup(t)
+
+	testSources := []models.Sources{
+		{Title: "Источник 1", Email: "test1@example.com", Phone_Number: "89999999999"},
+		{Title: "Источник 2", Email: "test2@example.com", Phone_Number: "89999999999"},
+		{Title: "Источник 3", Email: "test3@example.com", Phone_Number: "89999999999"},
+	}
+
+	for i := range testSources {
+		tdb.db.CreateSources(&testSources[i])
+	}
+
+	t.Run("Получение всех источников", func(t *testing.T) {
+		sources, err := tdb.db.GetSourcess()
+		if err != nil {
+			t.Errorf("Не удалось получить источники: %v", err)
+		}
+		if len(sources) != 3 {
+			t.Errorf("Ожидалось получить 3 источника, получено %d", len(sources))
+		}
+		names := make([]string, len(sources))
+		for i, s := range sources {
+			names[i] = s.Title
+		}
+		expectedNames := []string{"Источник 1", "Источник 2", "Источник 3"}
+		for _, exexpectedName := range expectedNames {
+			found := false
+			for _, name := range names {
+				if name == exexpectedName {
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Errorf("Источник %s не найден в результате", exexpectedName)
+			}
+		}
+	})
+
+	t.Run("Получение источников из пустой бд", func(t *testing.T) {
+		emptyDb := SetUpTestDB(t)
+		defer emptyDb.Cleanup(t)
+
+		sources, err := emptyDb.db.GetSourcess()
+		if err != nil {
+			t.Errorf("Ошибка при получении источников из пустой бд: %v", err)
+		}
+		if len(sources) != 0 {
+			t.Errorf("Ожидалось 0 источникв, получено %d", len(sources))
+		}
+	})
+}
