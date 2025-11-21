@@ -2,10 +2,12 @@ package database_test
 
 import (
 	"log"
+	"reflect"
 	"testing"
 
 	"github.com/h1nigami/go-react-app/backend/task/internal/database"
 	"github.com/h1nigami/go-react-app/backend/task/internal/models"
+	"gorm.io/gorm"
 )
 
 type TestDB struct {
@@ -76,7 +78,7 @@ func TestDB_GetSouces(t *testing.T) {
 
 	testSources := []models.Sources{
 		{Title: "Источник 1", Email: "test1@example.com", Phone_Number: "89999999999"},
-		{Title: "Источник 2", Email: "test2@example.com", Phone_Number: "89999999999"},
+		{Title: "Источник 1", Email: "test2@example.com", Phone_Number: "89999999999"},
 		{Title: "Источник 3", Email: "test3@example.com", Phone_Number: "89999999999"},
 	}
 
@@ -96,7 +98,7 @@ func TestDB_GetSouces(t *testing.T) {
 		for i, s := range sources {
 			names[i] = s.Title
 		}
-		expectedNames := []string{"Источник 1", "Источник 2", "Источник 3"}
+		expectedNames := []string{"Источник 1", "Источник 1", "Источник 3"}
 		for _, exexpectedName := range expectedNames {
 			found := false
 			for _, name := range names {
@@ -121,6 +123,38 @@ func TestDB_GetSouces(t *testing.T) {
 		}
 		if len(sources) != 0 {
 			t.Errorf("Ожидалось 0 источникв, получено %d", len(sources))
+		}
+	})
+}
+
+func TestDB_GetSourceById(t *testing.T) {
+	tdb := SetUpTestDB(t)
+	defer tdb.Cleanup(t)
+
+	t.Run("Получение существующего источника", func(t *testing.T) {
+		testSource := &models.Sources{
+			Title:        "Тестовый источник",
+			Email:        "test@example.com",
+			Phone_Number: "89999999999",
+		}
+		tdb.db.CreateSources(testSource)
+
+		foundSource, err := tdb.db.GetSourcesByid(int(testSource.ID))
+		if err != nil {
+			t.Errorf("Ошибка при получении источника по ID: %v", err)
+		}
+		if !reflect.DeepEqual(testSource.Title, foundSource.Title) || testSource.Email != foundSource.Email || testSource.Phone_Number != foundSource.Phone_Number {
+			t.Errorf("Источники не совпадают:\nОжидаемый: %v\nПолучен: %v", testSource, foundSource)
+		}
+	})
+
+	t.Run("Получение несуществующего источника", func(t *testing.T) {
+		_, err := tdb.db.GetSourcesByid(9999999)
+		if err == nil {
+			t.Errorf("Ожидалась ошибка для несуществующего ID, а получили nil")
+		}
+		if err != nil && err != gorm.ErrRecordNotFound {
+			t.Errorf("Неожиданная ошибка: %v", err)
 		}
 	})
 }

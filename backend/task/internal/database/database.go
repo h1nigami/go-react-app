@@ -19,7 +19,7 @@ func SetLoger(l *slog.Logger) {
 type SourcesStorage interface {
 	CreateSources(Sources *models.Sources)
 	GetSourcess() ([]models.Sources, error)
-	GetSourcesByid(id int) (models.Sources, error)
+	GetSourcesByid(id int) (*models.Sources, error)
 	DeleteSources(id int) models.Sources
 	UpdateSources(id int, Sources models.Sources) (*models.Sources, error)
 	CreateOrder(id int, order models.Order)
@@ -57,10 +57,13 @@ func (d *DB) GetSourcess() ([]models.Sources, error) {
 	return Sourcess, result.Error
 }
 
-func (d *DB) GetSourcesByid(id int) (models.Sources, error) {
+func (d *DB) GetSourcesByid(id int) (*models.Sources, error) {
 	var Sources models.Sources
 	result := d.Pool.Where("ID = ?", id).Find(&Sources)
-	return Sources, result.Error
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return &Sources, result.Error
 }
 
 func (d *DB) CreateSources(Sources *models.Sources) {
@@ -73,7 +76,7 @@ func (d *DB) DeleteSources(id int) models.Sources {
 		log.Error("database error", slog.String("DeleteSources", err.Error()))
 	}
 	d.Pool.Delete(&Sources)
-	return Sources
+	return *Sources
 }
 
 func (d *DB) UpdateSources(id int, Sources models.Sources) (*models.Sources, error) {
@@ -93,7 +96,7 @@ func (d *DB) UpdateSources(id int, Sources models.Sources) (*models.Sources, err
 		return nil, err
 	}
 
-	return &src, nil
+	return src, nil
 }
 
 // Заявки
