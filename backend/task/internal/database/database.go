@@ -22,7 +22,7 @@ type SourcesStorage interface {
 	GetSourcesByid(id int) (*models.Sources, error)
 	DeleteSources(id int) models.Sources
 	UpdateSources(id int, Sources models.Sources) (*models.Sources, error)
-	CreateOrder(id int, order models.Order)
+	CreateOrder(id int, order *models.Order)
 	GetOrders() ([]models.Order, error)
 	GetOrdersByid(id int) (*models.Order, error)
 	DeleteOrder(id int) error
@@ -100,9 +100,9 @@ func (d *DB) UpdateSources(id int, Sources models.Sources) (*models.Sources, err
 }
 
 // Заявки
-func (d *DB) CreateOrder(id int, order models.Order) {
+func (d *DB) CreateOrder(id int, order *models.Order) {
 	order.Source_id = id
-	d.Pool.Create(&order)
+	d.Pool.Create(order)
 }
 
 func (d *DB) GetOrders() ([]models.Order, error) {

@@ -254,7 +254,7 @@ func TestDB_CreateOrder(t *testing.T) {
 			},
 			Coordinates: models.Coordinates{X_from: 1.0, Y_from: 2.0, X_to: 3.0, Y_to: 4.0},
 		}
-		tdb.db.CreateOrder(int(src.ID), ord)
+		tdb.db.CreateOrder(int(src.ID), &ord)
 		ords, err := tdb.db.GetOrders()
 		if err != nil {
 			t.Errorf("Ошибка при получении заявок: %v", err)
@@ -294,7 +294,7 @@ func TestDB_GetOrders(t *testing.T) {
 		},
 	}
 	for i := range testOrders {
-		tdb.db.CreateOrder(int(source.ID), testOrders[i])
+		tdb.db.CreateOrder(int(source.ID), &testOrders[i])
 	}
 	t.Run("Получение всех заявок", func(t *testing.T) {
 		ords, err := tdb.db.GetOrders()
@@ -309,6 +309,43 @@ func TestDB_GetOrders(t *testing.T) {
 			if ords[i].Source_id != int(source.ID) {
 				t.Errorf("Ожидался Source_id = %d, получено %d", source.ID, ords[i].Source_id)
 			}
+		}
+	})
+}
+
+func TestDB_GetOrdersByID(t *testing.T) {
+	tdb := SetUpTestDB(t)
+	defer tdb.Cleanup(t)
+
+	t.Run("Получение заявки по родному айди и айди источника", func(t *testing.T) {
+		src := models.Sources{
+			Title: "Источник",
+		}
+		tdb.db.CreateSources(&src)
+		ord := models.Order{
+			Addres: models.Addres{
+				From: models.From{StreetFrom: "ул. Пушкина", NumberFrom: "123", CityFrom: "Москва", CountryFrom: "Россия"},
+				To:   models.To{StreetTo: "ул. Дантеса", NumberTo: "123", CityTo: "Москва", CountryTo: "Россия"},
+			},
+			Coordinates: models.Coordinates{X_from: 1.0, Y_from: 2.0, X_to: 3.0, Y_to: 4.0},
+		}
+
+		tdb.db.CreateOrder(int(src.ID), &ord)
+
+		ords, err := tdb.db.GetOrdersByid(int(ord.ID))
+		if err != nil {
+			t.Errorf("Ошибка при получении заявки по ID: %v", err)
+		}
+		if !reflect.DeepEqual(ords.ID, ord.ID) && !reflect.DeepEqual(ords.Addres, ord.Addres) {
+			t.Errorf("Ожидалось %v, получено %v", ord.ID, ords.ID)
+		}
+
+		result, err := tdb.db.GetOrderBySource(int(src.ID))
+		if err != nil {
+			t.Errorf("Ошибка получения заявки по источнику: %v", err)
+		}
+		if !reflect.DeepEqual(result.ID, ord.ID) {
+			t.Errorf("Ожидалось %d, получено %d", ords.ID, result.ID)
 		}
 	})
 }

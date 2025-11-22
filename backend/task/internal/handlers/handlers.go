@@ -125,10 +125,10 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 	var order models.Order
-	if err := c.BindJSON(&order); err != nil {
+	if err := c.BindJSON(order); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
-	storage.CreateOrder(int(src.ID), order)
+	storage.CreateOrder(int(src.ID), &order)
 }
 
 func OrderById(c *gin.Context) {
