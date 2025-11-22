@@ -349,3 +349,53 @@ func TestDB_GetOrdersByID(t *testing.T) {
 		}
 	})
 }
+
+func TestDB_DeleteOrder(t *testing.T) {
+	tdb := SetUpTestDB(t)
+	defer tdb.Cleanup(t)
+
+	t.Run("Удаление заявок", func(t *testing.T) {
+		source := models.Sources{
+			Title: "хз",
+		}
+		tdb.db.CreateSources(&source)
+		orders := []models.Order{
+			models.Order{
+				Addres: models.Addres{
+					From: models.From{
+						StreetFrom: "улица пушкина",
+					},
+					To: models.To{
+						StreetTo: "дом колотушкина",
+					},
+				},
+			},
+			models.Order{
+				Addres: models.Addres{
+					From: models.From{
+						StreetFrom: "улица пушкина",
+					},
+					To: models.To{
+						StreetTo: "дом колотушкина",
+					},
+				},
+			},
+		}
+		for i := range orders {
+			tdb.db.CreateOrder(int(source.ID), &orders[i])
+		}
+
+		ords, err := tdb.db.GetOrders()
+		if err != nil {
+			t.Errorf("Ошибка при получении заявок %v", err)
+		}
+		if len(ords) != 2 {
+			t.Errorf("Ожидалось 2 заявки, получено %d", len(ords))
+		}
+		for i := range 2 {
+			if err := tdb.db.DeleteOrder(int(ords[i].ID)); err != nil {
+				t.Errorf("Ошибка при удалении заявки %v", err)
+			}
+		}
+	})
+}
