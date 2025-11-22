@@ -205,3 +205,33 @@ func TestDB_UpdateSources(t *testing.T) {
 		}
 	})
 }
+
+func TestDB_DeleteSources(t *testing.T) {
+	tdb := SetUpTestDB(t)
+	defer tdb.Cleanup(t)
+
+	t.Run("Успешное удаление источника", func(t *testing.T) {
+		test := models.Sources{
+			Title:        "Источник для удаления",
+			Email:        "test@example.com",
+			Phone_Number: "89999999999",
+		}
+		tdb.db.CreateSources(&test)
+		deleted := tdb.db.DeleteSources(int(test.ID))
+		if deleted.ID != test.ID {
+			t.Errorf("ID удаленного источника не совпадает. Ожидалось %d получили %d", deleted.ID, test.ID)
+		}
+		_, err := tdb.db.GetSourcesByid(int(test.ID))
+		if err == nil {
+			t.Errorf("Источник должен быть удален из бд")
+		}
+
+		t.Run("Удаление несущетсвующего источника", func(t *testing.T) {
+			delete := tdb.db.DeleteSources(99999)
+
+			if delete.ID != 0 {
+				t.Errorf("Ожидался ID = 0 для несуществующего источника, получено %d", delete.ID)
+			}
+		})
+	})
+}

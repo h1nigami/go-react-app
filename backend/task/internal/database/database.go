@@ -73,7 +73,7 @@ func (d *DB) CreateSources(Sources *models.Sources) {
 func (d *DB) DeleteSources(id int) models.Sources {
 	Sources, err := d.GetSourcesByid(id)
 	if err != nil {
-		log.Error("database error", slog.String("DeleteSources", err.Error()))
+		return models.Sources{}
 	}
 	d.Pool.Delete(&Sources)
 	return *Sources
