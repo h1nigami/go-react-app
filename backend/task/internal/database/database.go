@@ -115,7 +115,17 @@ func (d *DB) GetOrdersByid(id int) (*models.Order, error) {
 	var Order models.Order
 	result := d.Pool.Where("ID = ?", id).Find(&Order)
 	if result.RowsAffected == 0 {
-		return nil, fmt.Errorf("не удалось найти ордер с ID %v", id)
+		return nil, gorm.ErrRecordNotFound
+	}
+	return &Order, nil
+}
+
+// id источника
+func (d *DB) GetOrderBySource(id int) (*models.Order, error) {
+	var Order models.Order
+	result := d.Pool.Where("Source_id = ?", id).Find(&Order)
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
 	}
 	return &Order, nil
 }

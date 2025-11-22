@@ -226,12 +226,44 @@ func TestDB_DeleteSources(t *testing.T) {
 			t.Errorf("Источник должен быть удален из бд")
 		}
 
-		t.Run("Удаление несущетсвующего источника", func(t *testing.T) {
-			delete := tdb.db.DeleteSources(99999)
+	})
+	t.Run("Удаление несущетсвующего источника", func(t *testing.T) {
+		delete := tdb.db.DeleteSources(99999)
 
-			if delete.ID != 0 {
-				t.Errorf("Ожидался ID = 0 для несуществующего источника, получено %d", delete.ID)
-			}
-		})
+		if delete.ID != 0 {
+			t.Errorf("Ожидался ID = 0 для несуществующего источника, получено %d", delete.ID)
+		}
+	})
+}
+
+func TestDB_CreateOrder(t *testing.T) {
+	tdb := SetUpTestDB(t)
+	defer tdb.Cleanup(t)
+
+	t.Run("Создание заявки", func(t *testing.T) {
+		src := models.Sources{
+			Title:        "Источник для заявки",
+			Email:        "test@example.com",
+			Phone_Number: "89999999999",
+		}
+		tdb.db.CreateSources(&src)
+		ord := models.Order{
+			Addres: models.Addres{
+				From: models.From{StreetFrom: "ул. Пушкина", NumberFrom: "123", CityFrom: "Москва", CountryFrom: "Россия"},
+				To:   models.To{StreetTo: "ул. Дантеса", NumberTo: "123", CityTo: "Москва", CountryTo: "Россия"},
+			},
+			Coordinates: models.Coordinates{X_from: 1.0, Y_from: 2.0, X_to: 3.0, Y_to: 4.0},
+		}
+		tdb.db.CreateOrder(int(src.ID), ord)
+		ords, err := tdb.db.GetOrders()
+		if err != nil {
+			t.Errorf("Ошибка при получении заявок: %v", err)
+		}
+		if len(ords) != 1 {
+			t.Errorf("Ожидалось 1 заявка, получено %d", len(ords))
+		}
+		if ords[0].Source_id != int(src.ID) {
+			t.Errorf("Ожидался Source_id = %d, получено %d", src.ID, ords[0].Source_id)
+		}
 	})
 }
