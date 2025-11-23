@@ -399,3 +399,48 @@ func TestDB_DeleteOrder(t *testing.T) {
 		}
 	})
 }
+
+func TestDB_UpdateOrder(t *testing.T) {
+	tdb := SetUpTestDB(t)
+	defer tdb.Cleanup(t)
+
+	t.Run("Обновление зявок", func(t *testing.T) {
+		source := models.Sources{
+			Title: "хз",
+		}
+		tdb.db.CreateSources(&source)
+		order := &models.Order{
+			Addres: models.Addres{
+				From: models.From{
+					StreetFrom: "Улица пушкина",
+				},
+				To: models.To{
+					StreetTo: "Дом колотушкина",
+				},
+			},
+		}
+		tdb.db.CreateOrder(int(source.ID), order)
+
+		newOrder := &models.Order{
+			Addres: models.Addres{
+				From: models.From{
+					StreetFrom: "Новая улица",
+				},
+				To: models.To{
+					StreetTo: "Конечная улица",
+				},
+			},
+		}
+		result, err := tdb.db.UpdateOrder(int(order.ID), *newOrder)
+		if err != nil {
+			t.Errorf("Ошибка при получении заявки из базы данных")
+		}
+		if result.Addres.StreetFrom != newOrder.Addres.StreetFrom || result.Addres.StreetTo != newOrder.Addres.StreetTo {
+			t.Errorf("Ожидалось: %v Получено :%v Ожидалось: %v Получено: %v",
+				newOrder.Addres.StreetFrom,
+				result.Addres.StreetFrom,
+				newOrder.Addres.StreetTo,
+				result.Addres.StreetTo)
+		}
+	})
+}

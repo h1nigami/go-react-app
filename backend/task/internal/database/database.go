@@ -26,7 +26,7 @@ type SourcesStorage interface {
 	GetOrders() ([]models.Order, error)
 	GetOrdersByid(id int) (*models.Order, error)
 	DeleteOrder(id int) error
-	UpdateOrder(id int, order models.Order) error
+	UpdateOrder(id int, order models.Order) (*models.Order, error)
 }
 
 type DB struct {
@@ -102,7 +102,7 @@ func (d *DB) UpdateSources(id int, Sources models.Sources) (*models.Sources, err
 // Заявки
 func (d *DB) CreateOrder(id int, order *models.Order) {
 	order.Source_id = id
-	d.Pool.Create(order)
+	d.Pool.Create(&order)
 }
 
 func (d *DB) GetOrders() ([]models.Order, error) {
@@ -123,7 +123,7 @@ func (d *DB) GetOrdersByid(id int) (*models.Order, error) {
 // id источника
 func (d *DB) GetOrderBySource(id int) (*models.Order, error) {
 	var Order models.Order
-	result := d.Pool.Where("Source_id = ?", id).Find(&Order)
+	result := d.Pool.Where("Source_id = ?", id).First(&Order)
 	if result.RowsAffected == 0 {
 		return nil, gorm.ErrRecordNotFound
 	}
@@ -139,15 +139,20 @@ func (d *DB) DeleteOrder(id int) error {
 	return nil
 }
 
-func (d *DB) UpdateOrder(id int, order models.Order) error {
-	result := d.Pool.Model(&models.Order{}).Where("ID = ?", id).Updates(order)
-	if result.Error != nil {
-		return result.Error
+func (d *DB) UpdateOrder(id int, order models.Order) (*models.Order, error) {
+	existing, err := d.GetOrdersByid(id)
+	if err != nil {
+		return nil, err
 	}
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("не удалось найти ордер с ID %v", id)
+
+	existing.Addres = order.Addres
+	existing.Coordinates = order.Coordinates
+
+	if err := d.Pool.Save(existing).Error; err != nil {
+		return nil, err
 	}
-	return nil
+
+	return existing, nil
 }
 
 var cfg *config.Config = config.MustLoad()
