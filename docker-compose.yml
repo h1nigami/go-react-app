@@ -1,20 +1,6 @@
 
 
 services:
-  auth:
-    build:
-      context: .
-      dockerfile: Dockerfile.auth
-    ports:
-      - "8082:8082"
-    environment:
-      - CONFIG_PATH=./local.yaml
-    volumes:
-      - ./backend/auth/internal/config:/app/config
-      - auth_data:/app/data
-    networks:
-      - app-network
-
   task:
     build:
       context: .
@@ -22,14 +8,14 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - CONFIG_PATH=./local.yaml
+      #- GIN_MODE=release
+      - CONFIG_PATH=/app/local.yaml
     volumes:
       - ./backend/task/internal/config:/app/config
       - task_data:/app/data
     networks:
       - app-network
-    depends_on:
-      - auth
+
 
   frontend:
     build:
@@ -40,11 +26,9 @@ services:
     networks:
       - app-network
     depends_on:
-      - auth
       - task
 
 volumes:
-  auth_data:
   task_data:
 
 networks:

@@ -1,36 +1,37 @@
-# Build stage
+# --- СТАДИЯ 1: СБОРКА ---
 FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
-
-# Copy go mod and sum files
-COPY backend/go.mod backend/go.sum ./
-
-# Download dependencies
+# Копируем содержимое backend/ в WORKDIR /app
+COPY backend/go.mod .
+COPY backend/go.sum .
 RUN go mod download
 
-# Copy the entire backend directory
+# Копируем остальной код
 COPY backend/ ./
 
-# Build the task service
+# Переходим в директорию сервиса и собираем бинарник статически
 WORKDIR /app/task/cmd/server
-RUN go build -o task-server main.go
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o task-server main.go
 
-# Final stage
-FROM alpine:latest
+# --- СТАДИЯ 2: РАБОЧЕЕ ОКРУЖЕНИЕ ---
+# Используем максимально минималистичный образ scratch
+FROM scratch
 
-RUN apk --no-cache add ca-certificates
+# Alpine включает ca-certificates по умолчанию, но scratch их не содержит. 
+# Если ваше приложение делает HTTPS запросы, вам нужно скопировать их.
+# Используем ту же логику копирования, что и для бинарника:
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-WORKDIR /root/
+WORKDIR /app
 
-# Copy the binary from builder stage
+# Копируем бинарник из стадии builder в /app/
 COPY --from=builder /app/task/cmd/server/task-server .
 
-# Copy config files
-COPY backend/task/local.yaml /app/local.yaml
+# Копируем конфиг из локальной машины в /app/
+COPY backend/task/local.yaml ./local.yaml
 
-# Expose port
 EXPOSE 8081
 
-# Run the binary
+# Запускаем приложение
 CMD ["./task-server"]
