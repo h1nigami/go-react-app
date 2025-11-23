@@ -443,4 +443,23 @@ func TestDB_UpdateOrder(t *testing.T) {
 				result.Addres.StreetTo)
 		}
 	})
+	t.Run("Обновление несуществующей заявки", func(t *testing.T) {
+		newOrder := &models.Order{
+			Addres: models.Addres{
+				From: models.From{
+					StreetFrom: "Новая улица",
+				},
+				To: models.To{
+					StreetTo: "Конечная улица",
+				},
+			},
+		}
+		result, err := tdb.db.UpdateOrder(999999, *newOrder)
+		if err == nil {
+			t.Errorf("Ожидалась ошибка с не найденой заявкой")
+		}
+		if result != nil {
+			t.Errorf("Ожидалось nil, получено %v", result)
+		}
+	})
 }
