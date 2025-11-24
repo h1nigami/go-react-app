@@ -42,10 +42,9 @@ type To struct {
 }
 
 type Order struct {
-	gorm.Model
+	gorm.Model         //`json:"-"`
+	Description string `json:"description"`
 	Addres      `json:"addres"`
-	From        `json:"from"`
-	To          `json:"to"`
 	Coordinates `json:"coordinates"`
 	Source_id   int `json:"source_id"`
 }

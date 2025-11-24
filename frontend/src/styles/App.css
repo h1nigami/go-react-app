@@ -11,7 +11,7 @@ body {
 
 /* Карточка */
 .todo-card {
-  margin-left: 200px;
+  margin-left: 60px;
   background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
   margin-top: 5rem;
   width: 100%;

@@ -13,20 +13,14 @@ export const getOrders = async () => {
   }
 };
 
-export const createOrder = async (orderData) => {
+export const createOrder = async (id ,orderData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/orders`, {
+    const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        source_id: parseInt(orderData.sourceId),
-        description: orderData.description,
-        priority: orderData.priority,
-        address: orderData.address || null,
-        status: 'created'
-      }),
+      body: JSON.stringify(orderData),
     });
     
     if (!response.ok) {
@@ -77,3 +71,17 @@ export const deleteOrder = async (orderId) => {
     throw error;
   }
 };
+
+export const geoCoder = async (addres) => {
+   if ("/" in addres) {
+    addres = addres.replace("/",".")
+   }
+  try {
+    const responce = await fetch(`${API_BASE_URL}/geocode/${addres}`)
+    if (!responce.ok){
+      throw new Error("Не получилось отправить запрос к геокодеру")
+    }
+  } catch (error) {
+    console.log(error)
+  } 
+} 

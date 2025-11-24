@@ -266,13 +266,13 @@ function App() {
 
             
             <OrderComponent 
-              orders={orders} 
+              orders={orders}
               onOrderCreate={fetchOrders}
               tasks={tasks}
             ></OrderComponent>
 
         <div className="map-contaiter">
-          <MapComponent orders={orders} onTaskUpdate={updatesource} onMapReady={setMapRef} onChange={fetchOrders}></MapComponent>
+          <MapComponent tasks={orders} onTaskUpdate={updatesource} onMapReady={setMapRef} onChange={fetchOrders}></MapComponent>
         </div>
       </div>
     </div>
