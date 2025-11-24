@@ -113,8 +113,7 @@ func AllOrders(c *gin.Context) {
 }
 
 func CreateOrder(c *gin.Context) {
-	id := c.Param("id")
-	srcid, err := strconv.Atoi(id)
+	srcid, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
@@ -125,10 +124,11 @@ func CreateOrder(c *gin.Context) {
 		return
 	}
 	var order models.Order
-	if err := c.BindJSON(order); err != nil {
+	if err := c.BindJSON(&order); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 	storage.CreateOrder(int(src.ID), &order)
+	c.JSON(http.StatusOK, order)
 }
 
 func OrderById(c *gin.Context) {
@@ -162,7 +162,7 @@ func Cities(c *gin.Context) {
 func GeoCode(c *gin.Context) {
 	addres, err := pkg.GeoCoder(c.Param("addres"))
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{"x": 1, "y": 1})
+		c.JSON(http.StatusOK, gin.H{"x": 1.0, "y": 1.0})
 		return
 	}
 	coords := map[string]any{
